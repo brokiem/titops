@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1777217980121,
+      "tag": "0000_steep_ezekiel_stane",
+      "breakpoints": true
+    }
+  ]
+}
