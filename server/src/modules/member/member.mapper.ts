@@ -5,7 +5,7 @@ export const toMemberResponse = (member: any): MemberDto => ({
     id: member.id,
     name: member.name,
     nim: member.nim,
-    programStudi: member.programStudi,
+    major: member.major,
     cardUid: member.cardUid ?? undefined,
     createdAt: member.createdAt,
     updatedAt: member.updatedAt,

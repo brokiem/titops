@@ -27,6 +27,8 @@ export const toEnrichedAttendanceResponse = (row: {
     sessionId: string;
     cardAssignmentId: string;
     memberName: string;
+    memberNim: string;
+    memberMajor: string;
     cardUid: string;
     checkInAt: Date;
     checkOutAt: Date | null;
@@ -37,6 +39,8 @@ export const toEnrichedAttendanceResponse = (row: {
     sessionId: row.sessionId,
     cardAssignmentId: row.cardAssignmentId,
     memberName: row.memberName,
+    memberNim: row.memberNim,
+    memberMajor: row.memberMajor,
     cardUid: row.cardUid,
     checkInAt: row.checkInAt,
     checkOutAt: row.checkOutAt,

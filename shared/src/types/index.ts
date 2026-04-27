@@ -1,3 +1,15 @@
+export const MAJORS = [
+  "Jurusan Teknik Sipil",
+  "Jurusan Teknik Mesin",
+  "Jurusan Teknik Elektro",
+  "Jurusan Teknologi Informasi",
+  "Jurusan Akuntansi",
+  "Jurusan Administrasi Bisnis",
+  "Jurusan Pariwisata",
+] as const;
+
+export type Major = (typeof MAJORS)[number];
+
 export type SessionMode = "IDLE" | "CLOCK_IN" | "CLOCK_OUT" | "CLOSED";
 
 export type ScanOutcome =
@@ -37,7 +49,7 @@ export type MemberDto = {
   id: string;
   name: string;
   nim: string;
-  programStudi: string;
+  major: string;
   cardUid?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -77,6 +89,8 @@ export type EnrichedAttendanceDto = {
   sessionId: string;
   cardAssignmentId: string;
   memberName: string;
+  memberNim: string;
+  memberMajor: string;
   cardUid: string;
   checkInAt: Date;
   checkOutAt: Date | null;

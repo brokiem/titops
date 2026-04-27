@@ -54,7 +54,7 @@ export const members = mysqlTable(
         id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
         name: varchar("name", { length: 191 }).notNull(),
         nim: char("nim", { length: 10 }).notNull().unique(),
-        programStudi: varchar("program_studi", {length: 64}).notNull(),
+        major: varchar("major", { length: 64 }).notNull(),
         createdAt: datetime("created_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
         updatedAt: datetime("updated_at", { fsp: 3 })
             .notNull()

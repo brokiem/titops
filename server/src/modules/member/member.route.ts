@@ -32,9 +32,9 @@ export class MemberRoute {
         });
 
         this.route.post('/', zValidator('json', createMemberSchema), async (c) => {
-            const {name, nim, programStudi} = c.req.valid('json');
+            const {name, nim, major} = c.req.valid('json');
 
-            const member = await service.create(name, nim, programStudi);
+            const member = await service.create(name, nim, major);
             return created(c, toMemberResponse(member));
         });
 

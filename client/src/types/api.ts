@@ -17,7 +17,7 @@ export type {
 export interface MemberCreateInput {
   name: string;
   nim: string;
-  programStudi: string;
+  major: string;
 }
 
 export interface MemberUpdateInput {

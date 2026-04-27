@@ -9,7 +9,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AttendanceTable } from "@/features/session/components/AttendanceTable";
 import { useReportDetail } from "./hooks/useReports";
 import { useDeleteAttendance } from "@/features/session/hooks/useSession";
-import { exportCsv, exportPdf } from "./lib/export";
+import { exportCsv } from "./lib/export";
 import { formatDate } from "@/lib/date";
 import type { EnrichedAttendanceDto } from "@/types/api";
 
@@ -25,7 +25,6 @@ export function ReportDetailPage() {
     const exportType = searchParams.get("export");
     if (exportType && session && attendance) {
       if (exportType === "csv") exportCsv(session, attendance);
-      if (exportType === "pdf") exportPdf(session, attendance);
     }
   }, [searchParams, session, attendance]);
 
@@ -52,7 +51,7 @@ export function ReportDetailPage() {
             <div className="space-y-1">
               <h1 className="text-2xl font-bold tracking-tight">{session.name}</h1>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant="secondary">{session.mode}</Badge>
+                <Badge variant="secondary">{session.mode.replace("_", " ")}</Badge>
                 <span>{formatDate(session.startedAt ?? session.createdAt)}</span>
                 <span>·</span>
                 <span>{attendance?.length ?? 0} records</span>
@@ -62,10 +61,6 @@ export function ReportDetailPage() {
               <Button variant="outline" size="sm" onClick={() => attendance && exportCsv(session, attendance)} disabled={!attendance?.length}>
                 <Download className="mr-2 h-4 w-4" />
                 CSV
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => attendance && exportPdf(session, attendance)} disabled={!attendance?.length}>
-                <Download className="mr-2 h-4 w-4" />
-                PDF
               </Button>
             </div>
           </div>
@@ -79,7 +74,7 @@ export function ReportDetailPage() {
             isLoading={!attendance && isLoading}
             isError={isError}
             error={error}
-            refetch={() => {}}
+            refetch={() => { }}
             onDelete={session?.isActive ? setRecordToDelete : undefined}
           />
         </CardContent>

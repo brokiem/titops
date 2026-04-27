@@ -12,7 +12,7 @@ export class MemberRepository {
             id: members.id,
             name: members.name,
             nim: members.nim,
-            programStudi: members.programStudi,
+            major: members.major,
             createdAt: members.createdAt,
             updatedAt: members.updatedAt,
             cardUid: cardAssignments.cardUid,
@@ -24,7 +24,7 @@ export class MemberRepository {
             id: members.id,
             name: members.name,
             nim: members.nim,
-            programStudi: members.programStudi,
+            major: members.major,
             createdAt: members.createdAt,
             updatedAt: members.updatedAt,
             cardUid: cardAssignments.cardUid,
@@ -32,11 +32,11 @@ export class MemberRepository {
         return member ?? null;
     }
 
-    public create = async (name: string, nim: string, programStudi: string) => {
+    public create = async (name: string, nim: string, major: string) => {
         const [result] = await this.database.insert(members).values({
             name: name,
             nim: nim,
-            programStudi: programStudi
+            major: major
         }).$returningId();
 
         if (!result) {

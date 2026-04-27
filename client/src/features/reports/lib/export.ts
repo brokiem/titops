@@ -1,13 +1,13 @@
 import type { EnrichedAttendanceDto, SessionDto } from "@/types/api";
-import { formatDate, formatTime } from "@/lib/date";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { formatTime } from "@/lib/date";
 
 export function exportCsv(session: SessionDto, attendance: EnrichedAttendanceDto[]): void {
-  const headers = ["Member", "Card UID", "Check In", "Check Out"];
-  const rows = attendance.map((a) => [
+  const headers = ["NO", "NAMA LENGKAP", "NIM", "JURUSAN", "CHECK-IN", "CHECK-OUT"];
+  const rows = attendance.map((a, index) => [
+    String(index + 1),
     a.memberName,
-    a.cardUid,
+    a.memberNim,
+    a.memberMajor,
     formatTime(a.checkInAt),
     a.checkOutAt ? formatTime(a.checkOutAt) : "",
   ]);
@@ -18,31 +18,6 @@ export function exportCsv(session: SessionDto, attendance: EnrichedAttendanceDto
 
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   downloadBlob(blob, `${session.name}-attendance.csv`);
-}
-
-export function exportPdf(session: SessionDto, attendance: EnrichedAttendanceDto[]): void {
-  const doc = new jsPDF();
-  
-  doc.setFontSize(16);
-  doc.text(session.name, 14, 20);
-  doc.setFontSize(10);
-  doc.text(`Date: ${formatDate(session.startedAt ?? session.createdAt)}`, 14, 28);
-  doc.text(`Total Records: ${attendance.length}`, 14, 34);
-
-  autoTable(doc, {
-    startY: 42,
-    head: [["Member", "Card UID", "Check In", "Check Out"]],
-    body: attendance.map((a) => [
-      a.memberName,
-      a.cardUid,
-      formatTime(a.checkInAt),
-      a.checkOutAt ? formatTime(a.checkOutAt) : "—",
-    ]),
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [30, 30, 30] },
-  });
-
-  doc.save(`${session.name}-attendance.pdf`);
 }
 
 function downloadBlob(blob: Blob, filename: string): void {

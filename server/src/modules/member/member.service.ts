@@ -20,8 +20,8 @@ export class MemberService {
         return member;
     }
 
-    public create = async (name: string, nim: string, programStudi: string) => {
-        const member = await this.repository.create(name, nim, programStudi);
+    public create = async (name: string, nim: string, major: string) => {
+        const member = await this.repository.create(name, nim, major);
         if (!member) {
             throw new ConflictError('Failed to create member');
         }

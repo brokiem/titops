@@ -87,6 +87,8 @@ export class SessionRepository {
                 sessionId: attendance.sessionId,
                 cardAssignmentId: attendance.cardAssignmentId,
                 memberName: members.name,
+                memberNim: members.nim,
+                memberMajor: members.major,
                 cardUid: cardAssignments.cardUid,
                 checkInAt: attendance.checkInAt,
                 checkOutAt: attendance.checkOutAt,

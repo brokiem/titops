@@ -17,7 +17,7 @@ export function MemberTable({ members, onEdit, onDelete }: MemberTableProps) {
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           <TableHead className="pl-6">Member</TableHead>
-          <TableHead>Program Studi</TableHead>
+          <TableHead>Major</TableHead>
           <TableHead>
             <div className="inline-flex items-center gap-1.5 align-middle">
               <span>Card UID</span>
@@ -58,8 +58,8 @@ export function MemberTable({ members, onEdit, onDelete }: MemberTableProps) {
               </div>
             </TableCell>
             <TableCell className="py-4">
-              {member.programStudi ? (
-                <div className="text-muted-foreground">{member.programStudi}</div>
+              {member.major ? (
+                <div className="text-muted-foreground">{member.major}</div>
               ) : (
                   <div className="text-muted-foreground">Unknown</div>
               )}

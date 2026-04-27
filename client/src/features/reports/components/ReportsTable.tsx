@@ -79,9 +79,6 @@ export function ReportsTable({ sessions, onDelete }: ReportsTableProps) {
                       <DropdownMenuItem asChild>
                         <Link to={`/dashboard/reports/${session.id}?export=csv`}>Download CSV</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/dashboard/reports/${session.id}?export=pdf`}>Download PDF</Link>
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Button
