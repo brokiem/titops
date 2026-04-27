@@ -5,8 +5,11 @@ import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ReportsTable } from "./components/ReportsTable";
+import { MonthlyReportDialog } from "./components/MonthlyReportDialog";
 import { useAllSessions, useDeleteSession } from "./hooks/useReports";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 import type { SessionDto } from "@/types/api";
 
 export function ReportsPage() {
@@ -14,6 +17,7 @@ export function ReportsPage() {
   const deleteSession = useDeleteSession();
 
   const [sessionToDelete, setSessionToDelete] = useState<SessionDto | null>(null);
+  const [isMonthlyDialogOpen, setIsMonthlyDialogOpen] = useState(false);
 
   const sortedSessions = [...(sessions ?? [])].sort((a, b) => {
     const dateA = new Date(a.startedAt ?? a.createdAt).getTime();
@@ -29,7 +33,16 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="Reports" description="Review session history and open detailed attendance exports." />
+      <PageHeader
+        title="Reports"
+        description="Review session history and open detailed attendance exports."
+        action={
+          <Button onClick={() => setIsMonthlyDialogOpen(true)}>
+            <Download className="mr-2 h-4 w-4" />
+            Monthly Report
+          </Button>
+        }
+      />
 
       {isError && <ErrorState message={error?.message} onRetry={refetch} />}
       {sessions && sessions.length === 0 && (
@@ -56,6 +69,12 @@ export function ReportsPage() {
         variant="destructive"
         loading={deleteSession.isPending}
         onConfirm={handleDelete}
+      />
+
+      <MonthlyReportDialog
+        open={isMonthlyDialogOpen}
+        onOpenChange={setIsMonthlyDialogOpen}
+        sessions={sessions}
       />
     </>
   );
