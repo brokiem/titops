@@ -59,7 +59,6 @@
         "hono": "4.12.14",
         "mysql2": "^3.22.2",
         "shared": "workspace:*",
-        "vite": "^8.0.9",
         "zod": "^4.3.6",
       },
       "devDependencies": {
