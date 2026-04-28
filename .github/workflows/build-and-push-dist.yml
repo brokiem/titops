@@ -28,7 +28,7 @@ jobs:
         run: bun run type-check
 
       - name: Build Client
-        run: bun run build
+        run: bun run build-client
 
       - name: Prepare Deployment Directory
         run: |
