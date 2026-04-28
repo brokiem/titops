@@ -4,8 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig(({ mode }) => {
-	// Load env file based on `mode` in the current working directory.
-	// Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
 	const env = loadEnv(mode, process.cwd(), "");
 
 	return {
@@ -18,7 +16,7 @@ export default defineConfig(({ mode }) => {
 		server: {
 			proxy: {
 				"/api": {
-					target: env.API_URL || "http://localhost:3000",
+					target: env.VITE_API_URL || "http://localhost:3000",
 					changeOrigin: true,
 				},
 			},

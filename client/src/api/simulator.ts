@@ -5,16 +5,16 @@ import type {
   ScanRequestInput,
   ScanRequestResultDto,
 } from "@/types/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getScanners(): Promise<CreatedMachineDto[]> {
-  return get<CreatedMachineDto[]>("/api/machines");
-}
+   return get<CreatedMachineDto[]>(`${API_URL}/api/machines`);}
 
 export async function sendPing(
   machineId: string,
   machineKey: string
 ): Promise<MachineDto> {
-  return post<MachineDto>(`/api/machines/${machineId}/heartbeat`, undefined, {
+  return post<MachineDto>(`${API_URL}/api/machines/${machineId}/heartbeat`, undefined, {
     "x-machine-key": machineKey,
   });
 }
@@ -25,7 +25,7 @@ export async function sendScan(
   data: ScanRequestInput
 ): Promise<ScanRequestResultDto> {
   return post<ScanRequestResultDto>(
-    `/api/machines/${machineId}/scan-requests`,
+    `${API_URL}/api/machines/${machineId}/scan-requests`,
     data,
     { "x-machine-key": machineKey }
   );
