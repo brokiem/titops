@@ -1,7 +1,7 @@
-import {cardAssignments, members, scanRequests} from "@server/db/schema";
+import {cardAssignments, members, scanRequests} from "../../db/schema";
 import {and, eq} from "drizzle-orm";
-import type {AppDatabase} from "@server/db/client";
-import {omitUndefinedValues} from "@server/utils/util";
+import type {AppDatabase} from "../../db/client";
+import {omitUndefinedValues} from "../../utils/util";
 
 export class MemberRepository {
     constructor(private database: AppDatabase) {

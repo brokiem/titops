@@ -1,4 +1,4 @@
-import type {CardAssignment} from "@server/db/schema";
+import type {CardAssignment} from "../../db/schema";
 import type { CardAssignmentDto, MemberDto } from "../../contracts";
 
 export const toMemberResponse = (member: any): MemberDto => ({

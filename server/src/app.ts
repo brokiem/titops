@@ -7,10 +7,6 @@ import {SessionRoute} from "./modules/session/session.route";
 import type {ApiErrorResponse} from "./contracts";
 import {createDatabase, type AppDatabase} from "./db/client";
 import {getServerEnv, type ServerEnv} from "./config/env";
-import {serveStatic} from "hono/bun";
-import {fileURLToPath} from "node:url";
-
-const clientDistPath = fileURLToPath(new URL("../../client/dist", import.meta.url));
 
 type CreateAppOptions = {
     db?: AppDatabase;
@@ -24,8 +20,6 @@ export const createApp = (options: CreateAppOptions = {}) => {
     const logger = options.logger ?? console;
 
     const rootApp = new Hono();
-
-    const isProd = process.env.NODE_ENV === 'production';
 
     const app = rootApp.basePath('/api');
 
@@ -42,11 +36,6 @@ export const createApp = (options: CreateAppOptions = {}) => {
 
     const sessionModule = new SessionRoute(db);
     app.route('/sessions', sessionModule.route);
-
-    if (isProd) {
-        rootApp.use('*', serveStatic({ root: clientDistPath }));
-        rootApp.use('/*', serveStatic({ root: clientDistPath, path: "index.html" }));
-    }
 
     return rootApp;
 }

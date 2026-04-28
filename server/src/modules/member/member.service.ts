@@ -1,6 +1,6 @@
 import {MemberRepository} from "./member.repository";
 import {ConflictError, NotFoundError} from "../../lib/errors";
-import {normalizeCardUid} from "@server/utils/util";
+import {normalizeCardUid} from "../../utils/util";
 import type {UpdateMemberInput} from "./member.schema";
 
 export class MemberService {

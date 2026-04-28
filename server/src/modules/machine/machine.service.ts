@@ -1,10 +1,10 @@
 import {MachineRepository} from "./machine.repository";
 import {ConflictError, NotFoundError, UnauthorizedError} from "../../lib/errors";
-import {randomBytes} from "node:crypto";
+import {createHmac, randomBytes} from "node:crypto";
 import {toCreatedMachineResponse} from "./machine.mapper";
-import type {ScanRequest} from "@server/db/schema";
+import type {ScanRequest} from "../../db/schema";
 import type {UpdateMachineInput} from "./machine.schema";
-import {normalizeCardUid} from "@server/utils/util";
+import {normalizeCardUid} from "../../utils/util";
 
 export class MachineService {
     constructor(
@@ -28,9 +28,7 @@ export class MachineService {
     public create = async (name: string) => {
         const machineKey = `mk_${randomBytes(32).toString('hex')}`;
 
-        const hasher = new Bun.CryptoHasher("sha256", this.options.machineKeySecret);
-        hasher.update(machineKey);
-        const digest = hasher.digest("hex");
+        const digest = this.hashMachineKey(machineKey);
 
         const result = await this.machineRespository.create(name, digest);
         if (!result) {
@@ -61,15 +59,17 @@ export class MachineService {
     private async validateMachineKey(id: string, machineKey: string) {
         const machine = await this.getById(id);
 
-        const hasher = new Bun.CryptoHasher("sha256", this.options.machineKeySecret);
-        hasher.update(machineKey);
-        const digest = hasher.digest('hex');
+        const digest = this.hashMachineKey(machineKey);
 
         if (machine.machineKeyDigest !== digest) {
             throw new UnauthorizedError('Invalid machine key');
         }
 
         return machine;
+    }
+
+    private hashMachineKey(machineKey: string) {
+        return createHmac("sha256", this.options.machineKeySecret).update(machineKey).digest("hex");
     }
 
     public sendHeartbeat = async (id: string, machineKey: string) => {

@@ -1,4 +1,5 @@
 import { relations, sql } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import {
     boolean,
     char,
@@ -11,6 +12,8 @@ import {
     varchar,
 } from "drizzle-orm/mysql-core";
 import type { InferSelectModel, InferInsertModel } from 'drizzle-orm'
+
+const createId = () => randomUUID();
 
 /** Enums */
 export const sessionModeEnum = mysqlEnum("session_mode", ["IDLE", "CLOCK_IN", "CLOCK_OUT", "CLOSED"]);
@@ -28,7 +31,7 @@ export const scanOutcomeEnum = mysqlEnum("scan_outcome", [
 export const sessions = mysqlTable(
     "sessions",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         name: varchar("name", { length: 191 }).notNull(),
         mode: sessionModeEnum.notNull().default("IDLE"),
         startedAt: datetime("started_at", { fsp: 3 }),
@@ -51,7 +54,7 @@ export const sessions = mysqlTable(
 export const members = mysqlTable(
     "members",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         name: varchar("name", { length: 191 }).notNull(),
         nim: char("nim", { length: 10 }).notNull().unique(),
         major: varchar("major", { length: 64 }).notNull(),
@@ -69,7 +72,7 @@ export const members = mysqlTable(
 export const cardAssignments = mysqlTable(
     "card_assignments",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         memberId: char("member_id", { length: 36 })
             .notNull()
             .references(() => members.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -91,7 +94,7 @@ export const cardAssignments = mysqlTable(
 export const machines = mysqlTable(
     "machines",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         name: varchar("name", { length: 191 }).notNull(),
         machineKeyDigest: char("machine_key_digest", { length: 64 }).notNull(),
         lastHeartbeatAt: datetime("last_heartbeat_at", { fsp: 3 }),
@@ -109,7 +112,7 @@ export const machines = mysqlTable(
 export const attendance = mysqlTable(
     "attendance",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         sessionId: char("session_id", { length: 36 })
             .notNull()
             .references(() => sessions.id, { onDelete: "restrict", onUpdate: "cascade" }),
@@ -135,7 +138,7 @@ export const attendance = mysqlTable(
 export const scanRequests = mysqlTable(
     "scan_requests",
     {
-        id: char("id", { length: 36 }).primaryKey().$defaultFn(Bun.randomUUIDv7),
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
         sessionId: char("session_id", { length: 36 })
             .notNull()
             .references(() => sessions.id, { onDelete: "restrict", onUpdate: "cascade" }),

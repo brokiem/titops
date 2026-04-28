@@ -1,6 +1,6 @@
 import {SessionRepository} from "./session.repository";
 import {BadRequestError, ConflictError, NotFoundError} from "../../lib/errors";
-import type {Session, ScanRequest} from "@server/db/schema";
+import type {Session, ScanRequest} from "../../db/schema";
 import type {UpdateSessionInput} from "./session.schema";
 
 export class SessionService {
@@ -131,4 +131,3 @@ export class SessionService {
         return session;
     }
 }
-

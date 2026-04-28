@@ -5,7 +5,7 @@ import {created, ok} from "../../lib/response";
 import {toAttendanceResponse, toEnrichedAttendanceResponse, toScanRequestResponse, toSessionResponse} from "./session.mapper";
 import {zValidator} from "@hono/zod-validator";
 import {createSessionSchema, updateSessionModeSchema, updateSessionSchema} from "./session.schema";
-import type { AppDatabase } from "@server/db/client";
+import type { AppDatabase } from "../../db/client";
 import type { ScanOutcome } from "../../contracts";
 
 export class SessionRoute {

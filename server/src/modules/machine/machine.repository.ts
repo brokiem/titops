@@ -1,8 +1,8 @@
-import {attendance, cardAssignments, machines, scanRequests, sessions} from "@server/db/schema";
-import type {ScanRequest} from "@server/db/schema";
+import {attendance, cardAssignments, machines, scanRequests, sessions} from "../../db/schema";
+import type {ScanRequest} from "../../db/schema";
 import {and, eq} from "drizzle-orm";
-import type {AppDatabase} from "@server/db/client";
-import {omitUndefinedValues} from "@server/utils/util";
+import type {AppDatabase} from "../../db/client";
+import {omitUndefinedValues} from "../../utils/util";
 
 export class MachineRepository {
     constructor(private database: AppDatabase) {

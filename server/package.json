@@ -20,7 +20,7 @@
 	},
 	"scripts": {
 		"dev": "bun --watch run src/server.ts",
-		"start": "bun run src/server.ts",
+		"start": "bun run src/index.ts",
 		"type-check": "tsc --noEmit -p tsconfig.json",
 		"lint": "eslint .",
 		"db:generate": "drizzle-kit generate",

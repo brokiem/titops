@@ -5,7 +5,7 @@ import {zValidator} from "@hono/zod-validator";
 import {createMachineSchema, createScanRequestSchema, updateMachineSchema} from "./machine.schema";
 import {created, ok} from "../../lib/response";
 import {toMachineResponse, toScanRequestResponse} from "./machine.mapper";
-import type { AppDatabase } from "@server/db/client";
+import type { AppDatabase } from "../../db/client";
 import {UnauthorizedError} from "../../lib/errors";
 
 export class MachineRoute {

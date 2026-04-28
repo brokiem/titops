@@ -1,4 +1,4 @@
-import type {Machine, ScanRequest} from "@server/db/schema";
+import type {Machine, ScanRequest} from "../../db/schema";
 import type { CreatedMachineDto, MachineDto, ScanRequestDto } from "../../contracts";
 
 export const toMachineResponse = (machine: Machine): MachineDto => ({

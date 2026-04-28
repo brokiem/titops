@@ -1,4 +1,8 @@
-export { createApp } from "./app";
-export { createDatabase } from "./db/client";
-export { getServerEnv, parseServerEnv } from "./config/env";
-export * from "./contracts";
+import {createApp} from "./app";
+import {getServerEnv} from "./config/env";
+
+const env = getServerEnv();
+
+const app = createApp({env});
+
+export default app;

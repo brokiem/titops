@@ -1,9 +1,9 @@
-import {attendance, cardAssignments, members, scanRequests, sessions} from "@server/db/schema";
-import type {Session, ScanRequest} from "@server/db/schema";
+import {attendance, cardAssignments, members, scanRequests, sessions} from "../../db/schema";
+import type {Session, ScanRequest} from "../../db/schema";
 import {and, desc, eq} from "drizzle-orm";
-import type {AppDatabase} from "@server/db/client";
+import type {AppDatabase} from "../../db/client";
 import type {UpdateSessionInput} from "./session.schema";
-import {omitUndefinedValues} from "@server/utils/util";
+import {omitUndefinedValues} from "../../utils/util";
 
 export class SessionRepository {
     constructor(private database: AppDatabase) {
@@ -150,4 +150,3 @@ export class SessionRepository {
         return existing;
     }
 }
-

@@ -5,7 +5,7 @@ import {created, ok} from "../../lib/response";
 import {toCardAssignmentResponse, toMemberResponse} from "./member.mapper";
 import {zValidator} from "@hono/zod-validator";
 import {assignCardSchema, createMemberSchema, updateMemberSchema} from "./member.schema";
-import type { AppDatabase } from "@server/db/client";
+import type { AppDatabase } from "../../db/client";
 
 export class MemberRoute {
     public route: Hono;
