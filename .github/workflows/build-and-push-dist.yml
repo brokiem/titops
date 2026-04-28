@@ -32,11 +32,22 @@ jobs:
           # Create a root folder to hold all the build outputs
           mkdir -p deploy-dist
           
-          # Copy the dist folders from each workspace package
-          # We check if they exist first, just in case
-          if [ -d "client/dist" ]; then cp -r client/dist deploy-dist/client-dist; fi
-          if [ -d "server/dist" ]; then cp -r server/dist deploy-dist/server-dist; fi
-          if [ -d "shared/dist" ]; then cp -r shared/dist deploy-dist/shared-dist; fi
+          # Copy the root package.json and bun.lock
+          cp package.json bun.lock deploy-dist/
+          
+          # Copy the dist folders and their package.json from each workspace package
+          if [ -d "client/dist" ]; then 
+            cp -r client/dist deploy-dist/client
+            cp client/package.json deploy-dist/client/
+          fi
+          if [ -d "server/dist" ]; then 
+            cp -r server/dist deploy-dist/server
+            cp server/package.json deploy-dist/server/
+          fi
+          if [ -d "shared/dist" ]; then 
+            cp -r shared/dist deploy-dist/shared
+            cp shared/package.json deploy-dist/shared/
+          fi
 
       - name: Push Dist to New Branch
         uses: peaceiris/actions-gh-pages@v4
