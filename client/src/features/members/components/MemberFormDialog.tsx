@@ -9,7 +9,7 @@ import { createMemberSchema, updateMemberSchema } from "@/lib/schemas/member";
 import type { CreateMemberFormValues, UpdateMemberFormValues } from "@/lib/schemas/member";
 import type { MemberDto } from "@/types/api";
 import { useEffect } from "react";
-import { MAJORS } from "shared";
+import { MAJORS } from "server/contracts";
 
 interface MemberFormDialogProps {
     open: boolean;
@@ -167,4 +167,3 @@ export function MemberFormDialog({
         </Dialog>
     );
 }
-

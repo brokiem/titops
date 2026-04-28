@@ -1,5 +1,5 @@
 import type {Attendance, Session, ScanRequest} from "@server/db/schema";
-import type {AttendanceDto, EnrichedAttendanceDto, ScanRequestDto, SessionDto} from "shared";
+import type {AttendanceDto, EnrichedAttendanceDto, ScanRequestDto, SessionDto} from "../../contracts";
 
 export const toSessionResponse = (session: Session): SessionDto => ({
     id: session.id,

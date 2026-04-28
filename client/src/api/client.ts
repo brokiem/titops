@@ -1,4 +1,4 @@
-import type { ApiEnvelope, ApiErrorResponse } from "shared";
+import type { ApiEnvelope, ApiErrorResponse } from "server/contracts";
 
 export class ApiError extends Error {
   public code: string | undefined;

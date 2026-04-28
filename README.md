@@ -2,7 +2,7 @@
 
 ![cover](https://cdn.stevedylan.dev/ipfs/bafybeievx27ar5qfqyqyud7kemnb5n2p4rzt2matogi6qttwkpxonqhra4)
 
-A full-stack TypeScript monorepo starter with shared types, using Bun, Hono, Vite, and React.
+A full-stack TypeScript monorepo starter with server-owned API contracts, using Bun, Hono, Vite, and React.
 
 ## Why bhvr?
 
@@ -11,7 +11,7 @@ While there are plenty of existing app building stacks out there, many of them a
 ## Features
 
 - **Full-Stack TypeScript**: End-to-end type safety between client and server
-- **Shared Types**: Common type definitions shared between client and server
+- **Server Contracts**: API DTOs and constants exported from the server package
 - **Monorepo Structure**: Organized as a Bun workspaces-based monorepo
 - **Modern Stack**:
   - [Bun](https://bun.sh) as the JavaScript runtime and package manager
@@ -25,8 +25,7 @@ While there are plenty of existing app building stacks out there, many of them a
 .
 ├── client/               # React frontend
 ├── server/               # Hono backend
-├── shared/               # Shared TypeScript definitions
-│   └── src/types/        # Type definitions used by both client and server
+│   └── src/contracts/    # API contracts consumed by server and client
 ├── package.json          # Root package.json with workspaces
 └── bun.lock              # Bun lockfile for all workspaces
 ```
@@ -48,7 +47,7 @@ server
 ```typescript src/index.ts
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import type { ApiResponse } from 'shared'
+import type { ApiEnvelope } from 'server/contracts'
 
 const app = new Hono()
 
@@ -60,9 +59,11 @@ app.get('/', (c) => {
 
 app.get('/hello', async (c) => {
 
-  const data: ApiResponse = {
-    message: "Hello BHVR!",
-    success: true
+  const data: ApiEnvelope<{ message: string; success: boolean }> = {
+    data: {
+      message: "Hello BHVR!",
+      success: true
+    }
   }
 
   return c.json(data, { status: 200 })
@@ -101,18 +102,18 @@ client
 ```typescript src/App.tsx
 import { useState } from 'react'
 import beaver from './assets/beaver.svg'
-import { ApiResponse } from 'shared'
+import type { ApiEnvelope } from 'server/contracts'
 import './App.css'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000"
 
 function App() {
-  const [data, setData] = useState<ApiResponse | undefined>()
+  const [data, setData] = useState<ApiEnvelope<{ message: string; success: boolean }> | undefined>()
 
   async function sendRequest() {
     try {
       const req = await fetch(`${SERVER_URL}/hello`)
-      const res: ApiResponse = await req.json()
+      const res: ApiEnvelope<{ message: string; success: boolean }> = await req.json()
       setData(res)
     } catch (error) {
       console.log(error)
@@ -136,8 +137,8 @@ function App() {
         {data && (
           <pre className='response'>
             <code>
-            Message: {data.message} <br />
-            Success: {data.success.toString()}
+            Message: {data.data.message} <br />
+            Success: {data.data.success.toString()}
             </code>
           </pre>
         )}
@@ -152,30 +153,17 @@ function App() {
 export default App
 ```
 
-### Shared
-
-The Shared package is used for anything you want to share between the Server and Client. This could be types or libraries that you use in both environments.
+### Server Contracts
 
 ```
-shared
-├── package.json
-├── src
-│   ├── index.ts
-│   └── types
-│       └── index.ts
-└── tsconfig.json
+server/src/contracts
+└── index.ts
 ```
 
-Inside the `src/index.ts` we export any of our code from the folders so it's usable in other parts of the monorepo
+API contracts live inside the server package and are exported through the browser-safe `server/contracts` subpath.
 
 ```typescript
-export * from "./types"
-```
-
-By running `bun run dev` or `bun run build` it will compile and export the packages from `shared` so it can be used in either `client` or `server`
-
-```typescript
-import { ApiResponse } from 'shared'
+import type { ApiEnvelope } from 'server/contracts'
 ```
 
 ## Getting Started
@@ -246,10 +234,10 @@ Deplying each piece is very versatile and can be done numerous ways, and explora
 
 ## Type Sharing
 
-Types are automatically shared between the client and server thanks to the shared package and TypeScript path aliases. You can import them in your code using:
+Types are shared between the client and server through the server-owned contracts export:
 
 ```typescript
-import { ApiResponse } from 'shared/types';
+import type { ApiEnvelope } from 'server/contracts';
 ```
 
 ## Learn More

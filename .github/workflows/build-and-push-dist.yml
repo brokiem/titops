@@ -36,7 +36,7 @@ jobs:
 
           cp package.json bun.lock tsconfig.json deploy-dist/
 
-          mkdir -p deploy-dist/client deploy-dist/server deploy-dist/shared
+          mkdir -p deploy-dist/client deploy-dist/server
 
           cp client/package.json deploy-dist/client/
           cp -r client/dist deploy-dist/client/dist
@@ -46,9 +46,6 @@ jobs:
           if [ -f "server/.env.example" ]; then
             cp server/.env.example deploy-dist/server/
           fi
-
-          cp shared/package.json shared/tsconfig.json deploy-dist/shared/
-          cp -r shared/src deploy-dist/shared/src
 
       - name: Push Dist to New Branch
         uses: peaceiris/actions-gh-pages@v4

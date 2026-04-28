@@ -4,7 +4,7 @@ import {MachineRoute} from "./modules/machine/machine.route";
 import {AppError} from "./lib/errors";
 import {MemberRoute} from "./modules/member/member.route";
 import {SessionRoute} from "./modules/session/session.route";
-import type {ApiErrorResponse} from "shared";
+import type {ApiErrorResponse} from "./contracts";
 import {createDatabase, type AppDatabase} from "./db/client";
 import {getServerEnv, type ServerEnv} from "./config/env";
 import {serveStatic} from "hono/bun";

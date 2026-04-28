@@ -6,7 +6,7 @@ import {toAttendanceResponse, toEnrichedAttendanceResponse, toScanRequestRespons
 import {zValidator} from "@hono/zod-validator";
 import {createSessionSchema, updateSessionModeSchema, updateSessionSchema} from "./session.schema";
 import type { AppDatabase } from "@server/db/client";
-import type { ScanOutcome } from "shared";
+import type { ScanOutcome } from "../../contracts";
 
 export class SessionRoute {
     public route: Hono;
@@ -101,4 +101,3 @@ export class SessionRoute {
         });
     }
 }
-

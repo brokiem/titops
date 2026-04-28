@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAJORS } from "shared";
+import { MAJORS } from "server/contracts";
 
 export const createMemberSchema = z.object({
   name: z.string().min(1, "Name is required").max(191, "Name is too long"),
@@ -27,4 +27,3 @@ export const assignCardSchema = z.object({
 
 export type CreateMemberFormValues = z.infer<typeof createMemberSchema>;
 export type UpdateMemberFormValues = z.infer<typeof updateMemberSchema>;
-

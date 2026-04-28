@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {MAJORS} from "shared";
+import {MAJORS} from "../../contracts";
 
 export const createMemberSchema = z.object({
     name: z.string().min(1).max(191),

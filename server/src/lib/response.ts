@@ -1,6 +1,6 @@
 import type {Context} from 'hono'
 import type {ContentfulStatusCode} from 'hono/utils/http-status'
-import type { ApiEnvelope } from 'shared'
+import type { ApiEnvelope } from '../contracts'
 
 /**
  * Generic JSON response

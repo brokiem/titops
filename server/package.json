@@ -12,6 +12,10 @@
 		".": {
 			"types": "./src/index.ts",
 			"default": "./src/index.ts"
+		},
+		"./contracts": {
+			"types": "./src/contracts/index.ts",
+			"default": "./src/contracts/index.ts"
 		}
 	},
 	"scripts": {
@@ -27,7 +31,6 @@
 		"drizzle-orm": "^0.45.2",
 		"hono": "4.12.14",
 		"mysql2": "^3.22.2",
-		"shared": "workspace:*",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {

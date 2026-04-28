@@ -1,5 +1,5 @@
 import type {Machine, ScanRequest} from "@server/db/schema";
-import type { CreatedMachineDto, MachineDto, ScanRequestDto } from "shared";
+import type { CreatedMachineDto, MachineDto, ScanRequestDto } from "../../contracts";
 
 export const toMachineResponse = (machine: Machine): MachineDto => ({
     id: machine.id,

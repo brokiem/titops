@@ -12,7 +12,7 @@ export type {
   EnrichedAttendanceDto,
   ScanRequestDto,
   ScanRequestResultDto,
-} from "shared";
+} from "server/contracts";
 
 export interface MemberCreateInput {
   name: string;
