@@ -1,4 +1,4 @@
-name: Build
+name: Build Client
 
 on:
   push:
@@ -24,36 +24,37 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      - name: Build Project
+      - name: Type Check Server
+        run: bun run type-check
+
+      - name: Build Client
         run: bun run build
 
-      - name: Prepare Dist Directory
+      - name: Prepare Deployment Directory
         run: |
-          # Create a root folder to hold all the build outputs
           mkdir -p deploy-dist
-          
-          # Copy the root package.json and bun.lock
-          cp package.json bun.lock deploy-dist/
-          
-          # Copy the dist folders and their package.json from each workspace package
-          if [ -d "client/dist" ]; then 
-            cp -r client/dist deploy-dist/client
-            cp client/package.json deploy-dist/client/
+
+          cp package.json bun.lock tsconfig.json deploy-dist/
+
+          mkdir -p deploy-dist/client deploy-dist/server deploy-dist/shared
+
+          cp client/package.json deploy-dist/client/
+          cp -r client/dist deploy-dist/client/dist
+
+          cp server/package.json server/tsconfig.json deploy-dist/server/
+          cp -r server/src deploy-dist/server/src
+          if [ -f "server/.env.example" ]; then
+            cp server/.env.example deploy-dist/server/
           fi
-          if [ -d "server/dist" ]; then 
-            cp -r server/dist deploy-dist/server
-            cp server/package.json deploy-dist/server/
-          fi
-          if [ -d "shared/dist" ]; then 
-            cp -r shared/dist deploy-dist/shared
-            cp shared/package.json deploy-dist/shared/
-          fi
+
+          cp shared/package.json shared/tsconfig.json deploy-dist/shared/
+          cp -r shared/src deploy-dist/shared/src
 
       - name: Push Dist to New Branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-dist
-          publish_branch: build-output # The branch where the dist will be pushed
-          commit_message: "chore: deploy dist folder [skip ci]"
-          force_orphan: true # Keeps the branch history clean with only the latest build
+          publish_branch: build-output
+          commit_message: "chore: deploy build output [skip ci]"
+          force_orphan: true

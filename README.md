@@ -12,13 +12,12 @@ While there are plenty of existing app building stacks out there, many of them a
 
 - **Full-Stack TypeScript**: End-to-end type safety between client and server
 - **Shared Types**: Common type definitions shared between client and server
-- **Monorepo Structure**: Organized as a workspaces-based monorepo with Turbo for build orchestration
+- **Monorepo Structure**: Organized as a Bun workspaces-based monorepo
 - **Modern Stack**:
   - [Bun](https://bun.sh) as the JavaScript runtime and package manager
   - [Hono](https://hono.dev) as the backend framework
   - [Vite](https://vitejs.dev) for frontend bundling
   - [React](https://react.dev) for the frontend UI
-  - [Turbo](https://turbo.build) for monorepo build orchestration and caching
 
 ## Project Structure
 
@@ -29,7 +28,7 @@ While there are plenty of existing app building stacks out there, many of them a
 ├── shared/               # Shared TypeScript definitions
 │   └── src/types/        # Type definitions used by both client and server
 ├── package.json          # Root package.json with workspaces
-└── turbo.json            # Turbo configuration for build orchestration
+└── bun.lock              # Bun lockfile for all workspaces
 ```
 
 ### Server
@@ -199,7 +198,7 @@ bun install
 ### Development
 
 ```bash
-# Run all workspaces in development mode with Turbo
+# Run all workspaces in development mode with Bun workspaces
 bun run dev
 
 # Or run individual workspaces directly
@@ -210,12 +209,11 @@ bun run dev:server    # Run the Hono backend
 ### Building
 
 ```bash
-# Build all workspaces with Turbo
+# Build all workspaces with Bun workspaces
 bun run build
 
-# Or build individual workspaces directly
-bun run build:client  # Build the React frontend
-bun run build:server  # Build the Hono backend
+# Build only the React frontend
+bun run build
 ```
 
 ### Additional Commands
@@ -260,5 +258,4 @@ import { ApiResponse } from 'shared/types';
 - [Vite Documentation](https://vitejs.dev/guide/)
 - [React Documentation](https://react.dev/learn)
 - [Hono Documentation](https://hono.dev/docs)
-- [Turbo Documentation](https://turbo.build/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)

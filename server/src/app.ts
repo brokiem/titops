@@ -8,6 +8,9 @@ import type {ApiErrorResponse} from "shared";
 import {createDatabase, type AppDatabase} from "./db/client";
 import {getServerEnv, type ServerEnv} from "./config/env";
 import {serveStatic} from "hono/bun";
+import {fileURLToPath} from "node:url";
+
+const clientDistPath = fileURLToPath(new URL("../../client/dist", import.meta.url));
 
 type CreateAppOptions = {
     db?: AppDatabase;
@@ -41,8 +44,8 @@ export const createApp = (options: CreateAppOptions = {}) => {
     app.route('/sessions', sessionModule.route);
 
     if (isProd) {
-        rootApp.use('*', serveStatic({ root: './client/dist' }));
-        rootApp.use('/*', serveStatic({ root: "./client/dist", path: "index.html" }));
+        rootApp.use('*', serveStatic({ root: clientDistPath }));
+        rootApp.use('/*', serveStatic({ root: clientDistPath, path: "index.html" }));
     }
 
     return rootApp;
