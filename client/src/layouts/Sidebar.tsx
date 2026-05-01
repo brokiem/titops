@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,7 +9,7 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-const navItems = [
+export const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/dashboard/members", icon: Users, label: "Members", end: false },
   { to: "/dashboard/scanners", icon: Radio, label: "Scanners", end: false },
@@ -16,10 +17,14 @@ const navItems = [
   { to: "/dashboard/scanner-simulator", icon: Cpu, label: "Simulator", end: false },
 ];
 
-export function Sidebar() {
+interface SidebarContentProps {
+  onNavigate?: () => void;
+}
+
+export const SidebarContent: FC<SidebarContentProps> = ({ onNavigate }) => {
   return (
-    <aside className="hidden md:flex md:flex-col md:w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <div className="flex items-center h-14 px-6 border-b">
+    <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
+      <div className="flex items-center h-14 px-6 border-b border-sidebar-border">
         <span className="text-lg font-bold tracking-tight">TITOPS</span>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
@@ -28,6 +33,7 @@ export function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.end}
+            onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
@@ -45,6 +51,14 @@ export function Sidebar() {
       <div className="px-6 py-4">
         <p className="text-xs text-sidebar-foreground/50">TITOPS v1.0</p>
       </div>
+    </div>
+  );
+};
+
+export function Sidebar() {
+  return (
+    <aside className="hidden shrink-0 border-r border-sidebar-border md:flex md:w-64">
+      <SidebarContent />
     </aside>
   );
 }

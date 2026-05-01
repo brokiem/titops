@@ -3,13 +3,14 @@ import { Moon, Sun, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { Sidebar } from "./Sidebar";
+import { SidebarContent } from "./Sidebar";
 import { useTheme } from "@/hooks/use-theme";
 import { format } from "date-fns";
 
 export function Topbar() {
   const { theme, toggleTheme } = useTheme();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -19,7 +20,7 @@ export function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 md:px-6 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex items-center gap-3">
-        <Sheet>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open navigation">
               <Menu className="h-5 w-5" />
@@ -27,7 +28,7 @@ export function Topbar() {
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <Sidebar />
+            <SidebarContent onNavigate={() => setSheetOpen(false)} />
           </SheetContent>
         </Sheet>
       </div>
