@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Activity, ArrowRight } from "lucide-react";
+import { Activity, ArrowRight, Loader2 } from "lucide-react";
 import { useActiveSessions } from "../hooks/useSessions";
 import { Badge } from "@/components/ui/badge";
 import { ErrorState } from "@/components/ErrorState";
@@ -21,6 +21,11 @@ export function ActiveSessionList() {
       </CardHeader>
       <CardContent>
         {isError && <ErrorState message={error?.message} onRetry={refetch} />}
+        {isLoading && !activeSession && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
         {activeSession === null && !isLoading && !isError && (
           <EmptyState title="No active session" description="Create a session to get started." />
         )}

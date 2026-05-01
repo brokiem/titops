@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ScannerCard } from "./components/ScannerCard";
+import { ScannerCardSkeleton } from "./components/ScannerCardSkeleton";
 import { CreateScannerDialog } from "./components/CreateScannerDialog";
 import { MachineKeyDialog } from "./components/MachineKeyDialog";
 import { useScanners, useCreateScanner, useDeleteScanner, useUpdateScanner } from "./hooks/useScanners";
@@ -13,7 +14,7 @@ import type { MachineDto } from "@/types/api";
 import type { CreateScannerFormValues } from "@/lib/schemas/scanner";
 
 export function ScannersPage() {
-  const { scanners, isError, error, refetch } = useScanners();
+  const { scanners, isLoading, isError, error, refetch } = useScanners();
   const createScanner = useCreateScanner();
   const deleteScanner = useDeleteScanner();
   const updateScanner = useUpdateScanner();
@@ -55,10 +56,19 @@ export function ScannersPage() {
       />
 
       {isError && <ErrorState message={error?.message} onRetry={refetch} />}
-      {scanners && scanners.length === 0 && (
+
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <ScannerCardSkeleton key={index} />
+          ))}
+        </div>
+      )}
+
+      {!isLoading && scanners && scanners.length === 0 && (
         <EmptyState icon={<Radio className="h-10 w-10" />} title="No scanners" description="Create a scanner to get started." />
       )}
-      {scanners && scanners.length > 0 && (
+      {!isLoading && scanners && scanners.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {scanners.map((scanner) => (
             <ScannerCard

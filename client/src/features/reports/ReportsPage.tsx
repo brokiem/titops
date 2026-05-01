@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ReportsTable } from "./components/ReportsTable";
+import { ReportsTableSkeleton } from "./components/ReportsTableSkeleton";
 import { MonthlyReportDialog } from "./components/MonthlyReportDialog";
 import { useAllSessions, useDeleteSession } from "./hooks/useReports";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +14,7 @@ import { Download } from "lucide-react";
 import type { SessionDto } from "@/types/api";
 
 export function ReportsPage() {
-  const { sessions, isError, error, refetch } = useAllSessions();
+  const { sessions, isLoading, isError, error, refetch } = useAllSessions();
   const deleteSession = useDeleteSession();
 
   const [sessionToDelete, setSessionToDelete] = useState<SessionDto | null>(null);
@@ -45,14 +46,23 @@ export function ReportsPage() {
       />
 
       {isError && <ErrorState message={error?.message} onRetry={refetch} />}
-      {sessions && sessions.length === 0 && (
+
+      {isLoading && (
+        <Card className="gap-0 overflow-hidden border-border/70 bg-card/95 shadow-sm py-0">
+          <CardContent className="px-0">
+            <ReportsTableSkeleton />
+          </CardContent>
+        </Card>
+      )}
+
+      {!isLoading && sessions && sessions.length === 0 && (
         <EmptyState
           icon={<FileBarChart className="h-10 w-10" />}
           title="No sessions yet"
           description="Session reports will appear here after sessions are created."
         />
       )}
-      {sessions && sessions.length > 0 && (
+      {!isLoading && sessions && sessions.length > 0 && (
         <Card className="gap-0 overflow-hidden border-border/70 bg-card/95 shadow-sm py-0">
           <CardContent className="px-0">
             <ReportsTable sessions={sortedSessions} onDelete={setSessionToDelete} />

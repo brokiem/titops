@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import type { EnrichedAttendanceDto } from "@/types/api";
 import { formatTime } from "@/lib/date";
-import { ClipboardList, Clock3, CreditCard, UserRound, Trash2 } from "lucide-react";
+import { ClipboardList, Clock3, CreditCard, UserRound, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AttendanceTableProps {
@@ -18,10 +18,16 @@ interface AttendanceTableProps {
 
 export function AttendanceTable({ attendance, isLoading, isError, error, refetch, onDelete }: AttendanceTableProps) {
     if (isError) return <ErrorState message={error?.message} onRetry={refetch} />;
+    if (isLoading && !attendance) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
     if (!attendance || (attendance.length === 0 && !isLoading)) {
         return <EmptyState icon={<ClipboardList className="h-10 w-10" />} title="No attendance records" description="Scans will appear here when members check in." />;
     }
-    if (!attendance && isLoading) return null;
 
     return (
         <Table>

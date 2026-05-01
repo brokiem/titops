@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMembers, useAssignCard } from "@/features/members/hooks/useMembers";
-import { Search } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Search, Loader2 } from "lucide-react";
 
 interface AssignCardDialogProps {
   open: boolean;
@@ -16,14 +17,15 @@ export function AssignCardDialog({ open, onOpenChange, cardUid }: AssignCardDial
   const { members } = useMembers();
   const assignCard = useAssignCard();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
   const filteredMembers = useMemo(() => {
     if (!members) return [];
-    if (!search) return members;
-    const q = search.toLowerCase();
+    if (!debouncedSearch) return members;
+    const q = debouncedSearch.toLowerCase();
     return members.filter((m) => m.name.toLowerCase().includes(q) || m.nim.includes(q));
-  }, [members, search]);
+  }, [members, debouncedSearch]);
 
   const handleAssign = async () => {
     if (!selectedMemberId) return;
@@ -53,8 +55,9 @@ export function AssignCardDialog({ open, onOpenChange, cardUid }: AssignCardDial
                 placeholder="Search by name or NIM…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 pr-9"
               />
+              {search !== debouncedSearch && search.length > 0 && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />}
             </div>
           </div>
           <div className="max-h-48 overflow-y-auto border rounded-md">
