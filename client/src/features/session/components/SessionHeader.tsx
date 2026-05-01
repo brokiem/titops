@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import type { SessionDto } from "@/types/api";
 import { formatDate } from "@/lib/date";
 
@@ -35,6 +36,7 @@ export function SessionHeader({ session, attendanceCount, onToggleMode, onClose,
       {session.isActive && (
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={onToggleMode} disabled={modeLoading}>
+            {modeLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Switch to {nextMode.replace("_", " ")}
           </Button>
           <Button variant="destructive" onClick={onClose}>

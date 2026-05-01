@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ErrorState } from "@/components/ErrorState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { SessionHeader } from "./components/SessionHeader";
+import { SessionHeaderSkeleton } from "./components/SessionHeaderSkeleton";
 import { AttendanceTable } from "./components/AttendanceTable";
 import { UnknownCardAlert } from "./components/UnknownCardAlert";
 import { useSession, useEnrichedAttendance, useUnknownScans, useUpdateSessionMode, useCloseSession, useDeleteAttendance } from "./hooks/useSession";
@@ -48,14 +49,18 @@ export function SessionDetailPage() {
 
   return (
     <>
-      {session && (
-        <SessionHeader
-          session={session}
-          attendanceCount={attendance?.length ?? 0}
-          onToggleMode={handleToggleMode}
-          onClose={() => setCloseOpen(true)}
-          modeLoading={updateMode.isPending}
-        />
+      {isLoading ? (
+        <SessionHeaderSkeleton />
+      ) : (
+        session && (
+          <SessionHeader
+            session={session}
+            attendanceCount={attendance?.length ?? 0}
+            onToggleMode={handleToggleMode}
+            onClose={() => setCloseOpen(true)}
+            modeLoading={updateMode.isPending}
+          />
+        )
       )}
 
       {session?.isActive && <UnknownCardAlert scans={scans} />}
