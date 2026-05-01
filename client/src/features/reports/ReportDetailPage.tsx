@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ErrorState } from "@/components/ErrorState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AttendanceTable } from "@/features/session/components/AttendanceTable";
+import { ReportDetailHeaderSkeleton } from "./components/ReportDetailHeaderSkeleton";
 import { useReportDetail } from "./hooks/useReports";
 import { useDeleteAttendance } from "@/features/session/hooks/useSession";
 import { exportCsv } from "./lib/export";
@@ -46,24 +47,28 @@ export function ReportDetailPage() {
           <ArrowLeft className="h-4 w-4" />
           Back to Reports
         </Link>
-        {session && (
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold tracking-tight">{session.name}</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant="secondary">{session.mode.replace("_", " ")}</Badge>
-                <span>{formatDate(session.startedAt ?? session.createdAt)}</span>
-                <span>·</span>
-                <span>{attendance?.length ?? 0} records</span>
+        {isLoading ? (
+          <ReportDetailHeaderSkeleton />
+        ) : (
+          session && (
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold tracking-tight">{session.name}</h1>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Badge variant="secondary">{session.mode.replace("_", " ")}</Badge>
+                  <span>{formatDate(session.startedAt ?? session.createdAt)}</span>
+                  <span>·</span>
+                  <span>{attendance?.length ?? 0} records</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => attendance && exportCsv(session, attendance)} disabled={!attendance?.length}>
+                  <Download className="mr-2 h-4 w-4" />
+                  CSV
+                </Button>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => attendance && exportCsv(session, attendance)} disabled={!attendance?.length}>
-                <Download className="mr-2 h-4 w-4" />
-                CSV
-              </Button>
-            </div>
-          </div>
+          )
         )}
       </div>
 
