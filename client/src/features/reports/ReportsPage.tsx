@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {FileBarChart, Loader2} from "lucide-react";
 import {PageHeader} from "@/components/PageHeader";
 import {EmptyState} from "@/components/EmptyState";
@@ -16,6 +16,21 @@ import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue} from "@/c
 import {useDebounce} from "@/hooks/use-debounce";
 import type {SessionDto} from "@/types/api";
 
+const MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
 export function ReportsPage() {
     const {sessions, isLoading, isError, error, refetch} = useAllSessions();
     const deleteSession = useDeleteSession();
@@ -23,60 +38,57 @@ export function ReportsPage() {
     const [sessionToDelete, setSessionToDelete] = useState<SessionDto | null>(null);
     const [isMonthlyDialogOpen, setIsMonthlyDialogOpen] = useState(false);
 
-    // Filtering state
-    const MONTHS = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-
     const [nameFilter, setNameFilter] = useState("");
     const debouncedName = useDebounce(nameFilter, 250);
     const [monthFilter, setMonthFilter] = useState<string>("all");
     const [yearFilter, setYearFilter] = useState<string>("all");
 
-    const availableYears = Array.from(new Set((sessions ?? []).map((s) => new Date(s.startedAt ?? s.createdAt).getFullYear()))).sort((a, b) => b - a);
+    const availableYears = useMemo(() => {
+        if (!sessions?.length) return [];
+        return Array.from(new Set(sessions.map((s) => new Date(s.startedAt ?? s.createdAt).getFullYear()))).sort((a, b) => b - a);
+    }, [sessions]);
 
-    const filteredSessions = (sessions ?? []).filter((s) => {
-        const d = new Date(s.startedAt ?? s.createdAt);
+    const filteredSessions = useMemo(() => {
+        if (!sessions) return [];
+        const q = debouncedName.trim().toLowerCase();
 
-        if (monthFilter !== "all" && d.getMonth().toString() !== monthFilter) return false;
-        if (yearFilter !== "all" && d.getFullYear().toString() !== yearFilter) return false;
+        return sessions.filter((s) => {
+            const d = new Date(s.startedAt ?? s.createdAt);
 
-        if (debouncedName) {
-            const q = debouncedName.trim().toLowerCase();
-            if (!s.name?.toLowerCase().includes(q)) return false;
-        }
+            return (
+                (monthFilter === "all" || d.getMonth().toString() === monthFilter) &&
+                (yearFilter === "all" || d.getFullYear().toString() === yearFilter) &&
+                (!q || s.name?.toLowerCase().includes(q))
+            );
+        });
+    }, [sessions, debouncedName, monthFilter, yearFilter]);
 
-        return true;
-    });
+    const sortedFilteredSessions = useMemo(() => {
+        return [...filteredSessions].sort((a, b) => {
+            const dateA = new Date(a.startedAt ?? a.createdAt).getTime();
+            const dateB = new Date(b.startedAt ?? b.createdAt).getTime();
+            return dateB - dateA;
+        });
+    }, [filteredSessions]);
 
-    const sortedFilteredSessions = [...filteredSessions].sort((a, b) => {
-        const dateA = new Date(a.startedAt ?? a.createdAt).getTime();
-        const dateB = new Date(b.startedAt ?? b.createdAt).getTime();
-        return dateB - dateA;
-    });
+    const isSearching = nameFilter !== debouncedName && nameFilter.length > 0;
+    const hasActiveFilters = nameFilter.trim().length > 0 || monthFilter !== "all" || yearFilter !== "all";
 
-    const resetFilters = () => {
+    const resetFilters = useCallback(() => {
         setNameFilter("");
         setMonthFilter("all");
         setYearFilter("all");
-    };
+    }, []);
 
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         if (!sessionToDelete) return;
         await deleteSession.mutateAsync(sessionToDelete.id);
         setSessionToDelete(null);
-    };
+    }, [deleteSession, sessionToDelete]);
+
+    const openMonthlyDialog = useCallback(() => {
+        setIsMonthlyDialogOpen(true);
+    }, []);
 
     return (
         <>
@@ -84,7 +96,7 @@ export function ReportsPage() {
                 title="Reports"
                 description="Review session history and open detailed attendance exports."
                 action={
-                    <Button onClick={() => setIsMonthlyDialogOpen(true)}>
+                    <Button onClick={openMonthlyDialog}>
                         <Download className="mr-2 h-4 w-4"/>
                         Monthly Report
                     </Button>
@@ -104,7 +116,7 @@ export function ReportsPage() {
                                 value={nameFilter}
                                 onChange={(e) => setNameFilter(e.target.value)}
                             />
-                            {nameFilter !== debouncedName && nameFilter.length > 0 && (
+                            {isSearching && (
                                 <Loader2 className="pointer-events-none absolute inset-y-0 right-3 my-auto h-4 w-4 animate-spin text-muted-foreground"/>
                             )}
                         </div>
@@ -161,7 +173,7 @@ export function ReportsPage() {
                             <EmptyState
                                 icon={<FileBarChart className="h-10 w-10"/>}
                                 title="No sessions match your filters"
-                                description="Try adjusting or clearing filters to find sessions."
+                                description={hasActiveFilters ? "Try adjusting or clearing filters to find sessions." : "No sessions available yet."}
                                 action={
                                     <Button variant="outline" onClick={resetFilters}>
                                         Clear filters
