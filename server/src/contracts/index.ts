@@ -111,3 +111,20 @@ export type ScanRequestDto = {
 export type ScanRequestResultDto = ScanRequestDto & {
   replayed: boolean;
 };
+
+export type AdminRole = "SUPERADMIN" | "ADMIN";
+
+export type AdminAccountDto = {
+  id: string;
+  email: string;
+  name: string;
+  role: AdminRole;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type LoginResultDto = {
+  token: string;
+  expiresAt: Date;
+  admin: AdminAccountDto;
+};

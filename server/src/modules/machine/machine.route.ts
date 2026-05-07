@@ -1,4 +1,4 @@
-import {Hono} from 'hono'
+import {Hono, type MiddlewareHandler} from 'hono'
 import {MachineRepository} from './machine.repository'
 import {MachineService} from './machine.service'
 import {zValidator} from "@hono/zod-validator";
@@ -11,35 +11,35 @@ import {UnauthorizedError} from "../../lib/errors";
 export class MachineRoute {
     public route: Hono
 
-    constructor(database: AppDatabase, options: { machineKeySecret: string }) {
+    constructor(database: AppDatabase, options: { machineKeySecret: string }, authMiddleware: MiddlewareHandler) {
         this.route = new Hono();
 
         const repo = new MachineRepository(database);
         const service = new MachineService(repo, options);
 
-        this.registerRoutes(service);
+        this.registerRoutes(service, authMiddleware);
     }
 
-    private registerRoutes(service: MachineService) {
-        this.route.get('/', async (c) => {
+    private registerRoutes(service: MachineService, authMiddleware: MiddlewareHandler) {
+        this.route.get('/', authMiddleware, async (c) => {
             const machines = await service.getAll();
             return ok(c, machines.map(toMachineResponse));
         });
 
-        this.route.get('/:id', async (c) => {
+        this.route.get('/:id', authMiddleware, async (c) => {
             const id = c.req.param('id');
             const machine = await service.getById(id);
             return ok(c, toMachineResponse(machine));
         });
 
-        this.route.post('/', zValidator('json', createMachineSchema), async (c) => {
+        this.route.post('/', authMiddleware, zValidator('json', createMachineSchema), async (c) => {
             const {name} = c.req.valid('json');
 
             const machine = await service.create(name);
             return created(c, machine);
         });
 
-        this.route.patch('/:id', zValidator('json', updateMachineSchema), async (c) => {
+        this.route.patch('/:id', authMiddleware, zValidator('json', updateMachineSchema), async (c) => {
             const id = c.req.param('id');
             const data = c.req.valid('json');
 
@@ -79,7 +79,7 @@ export class MachineRoute {
             return created(c, payload);
         });
 
-        this.route.delete('/:id', async (c) => {
+        this.route.delete('/:id', authMiddleware, async (c) => {
             const id = c.req.param('id');
             const machine = await service.deleteById(id);
             return ok(c, toMachineResponse(machine));

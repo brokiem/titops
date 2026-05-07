@@ -7,6 +7,8 @@ import {SessionRoute} from "./modules/session/session.route";
 import type {ApiErrorResponse} from "./contracts";
 import {createDatabase, type AppDatabase} from "./db/client";
 import {getServerEnv, type ServerEnv} from "./config/env";
+import {AuthRoute} from "./modules/auth/auth.route";
+import {createAuthMiddleware} from "./modules/auth/auth.middleware";
 
 type CreateAppOptions = {
     db?: AppDatabase;
@@ -28,13 +30,23 @@ export const createApp = (options: CreateAppOptions = {}) => {
 
     setupErrorHandler(rootApp, logger);
 
-    const machineModule = new MachineRoute(db, {machineKeySecret: env.MACHINE_KEY_SECRET});
+    const authModule = new AuthRoute(db, {
+        jwtSecret: env.JWT_SECRET,
+        superadminEmail: env.SUPERADMIN_EMAIL,
+        superadminPassword: env.SUPERADMIN_PASSWORD,
+    });
+    void authModule.service.ensureSuperadmin().catch((error: unknown) => logger.error(error));
+
+    const authMiddleware = createAuthMiddleware(authModule.service);
+    app.route('/auth', authModule.route);
+
+    const machineModule = new MachineRoute(db, {machineKeySecret: env.MACHINE_KEY_SECRET}, authMiddleware);
     app.route('/machines', machineModule.route);
 
-    const memberModule = new MemberRoute(db);
+    const memberModule = new MemberRoute(db, authMiddleware);
     app.route('/members', memberModule.route);
 
-    const sessionModule = new SessionRoute(db);
+    const sessionModule = new SessionRoute(db, authMiddleware);
     app.route('/sessions', sessionModule.route);
 
     return rootApp;

@@ -1,4 +1,4 @@
-import {Hono} from "hono";
+import {Hono, type MiddlewareHandler} from "hono";
 import {SessionRepository} from "./session.repository";
 import {SessionService} from "./session.service";
 import {created, ok} from "../../lib/response";
@@ -11,8 +11,9 @@ import type { ScanOutcome } from "../../contracts";
 export class SessionRoute {
     public route: Hono;
 
-    constructor(database: AppDatabase) {
+    constructor(database: AppDatabase, authMiddleware: MiddlewareHandler) {
         this.route = new Hono();
+        this.route.use('*', authMiddleware);
 
         const repo = new SessionRepository(database);
         const service = new SessionService(repo);

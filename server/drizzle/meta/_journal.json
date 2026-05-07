@@ -8,6 +8,13 @@
       "when": 1777267157852,
       "tag": "0000_chemical_skaar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1778125767252,
+      "tag": "0002_perfect_vanisher",
+      "breakpoints": true
     }
   ]
 }

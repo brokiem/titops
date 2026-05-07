@@ -1,4 +1,4 @@
-import {Hono} from "hono";
+import {Hono, type MiddlewareHandler} from "hono";
 import {MemberRepository} from "./member.repository";
 import {MemberService} from "./member.service";
 import {created, ok} from "../../lib/response";
@@ -10,8 +10,9 @@ import type { AppDatabase } from "../../db/client";
 export class MemberRoute {
     public route: Hono;
 
-    constructor(database: AppDatabase) {
+    constructor(database: AppDatabase, authMiddleware: MiddlewareHandler) {
         this.route = new Hono();
+        this.route.use('*', authMiddleware);
 
         const repo = new MemberRepository(database);
         const service = new MemberService(repo);

@@ -3,6 +3,9 @@ import { z } from "zod";
 const serverEnvSchema = z.object({
     DATABASE_URL: z.url(),
     MACHINE_KEY_SECRET: z.string().min(1),
+    JWT_SECRET: z.string().min(32),
+    SUPERADMIN_EMAIL: z.email(),
+    SUPERADMIN_PASSWORD: z.string().min(8),
     PORT: z.coerce.number().int().min(1).max(65535).default(3000),
 });
 

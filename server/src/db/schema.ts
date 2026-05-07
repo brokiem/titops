@@ -26,6 +26,7 @@ export const scanOutcomeEnum = mysqlEnum("scan_outcome", [
     "INVALID_CHECKOUT_TIME",
     "UNKNOWN_CARD"
 ]);
+export const adminRoleEnum = mysqlEnum("admin_role", ["SUPERADMIN", "ADMIN"]);
 
 /** Tables */
 export const sessions = mysqlTable(
@@ -161,6 +162,27 @@ export const scanRequests = mysqlTable(
     })
 );
 
+export const adminAccounts = mysqlTable(
+    "admin_accounts",
+    {
+        id: char("id", { length: 36 }).primaryKey().$defaultFn(createId),
+        email: varchar("email", { length: 191 }).notNull(),
+        name: varchar("name", { length: 191 }).notNull(),
+        passwordHash: varchar("password_hash", { length: 191 }).notNull(),
+        role: adminRoleEnum.notNull().default("ADMIN"),
+        isActive: boolean("is_active").notNull().default(true),
+        createdAt: datetime("created_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
+        updatedAt: datetime("updated_at", { fsp: 3 })
+            .notNull()
+            .default(sql`CURRENT_TIMESTAMP(3)`)
+            .$onUpdate(() => new Date())
+    },
+    (t) => ({
+        emailUq: uniqueIndex("admin_accounts_email_uq").on(t.email),
+        roleIdx: index("admin_accounts_role_idx").on(t.role)
+    })
+);
+
 /** Relations */
 export const sessionsRelations = relations(sessions, ({ many }) => ({
     attendance: many(attendance),
@@ -212,6 +234,7 @@ export type CardAssignment = InferSelectModel<typeof cardAssignments>
 export type Machine = InferSelectModel<typeof machines>
 export type Attendance = InferSelectModel<typeof attendance>
 export type ScanRequest = InferSelectModel<typeof scanRequests>
+export type AdminAccount = InferSelectModel<typeof adminAccounts>
 // INSERT types
 export type NewSession = InferInsertModel<typeof sessions>
 export type NewMember = InferInsertModel<typeof members>
@@ -219,3 +242,4 @@ export type NewCardAssignment = InferInsertModel<typeof cardAssignments>
 export type NewMachine = InferInsertModel<typeof machines>
 export type NewAttendance = InferInsertModel<typeof attendance>
 export type NewScanRequest = InferInsertModel<typeof scanRequests>
+export type NewAdminAccount = InferInsertModel<typeof adminAccounts>
