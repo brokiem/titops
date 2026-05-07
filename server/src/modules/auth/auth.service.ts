@@ -1,6 +1,7 @@
 import { ConflictError, ForbiddenError, UnauthorizedError } from "../../lib/errors";
 import type { AdminAccount } from "../../db/schema";
 import type { AdminRole, LoginResultDto } from "../../contracts";
+import argon2 from "argon2";
 import { toAdminAccountResponse } from "./auth.mapper";
 import type { AuthRepository } from "./auth.repository";
 import type { CreateAdminInput, LoginInput } from "./auth.schema";
@@ -32,7 +33,7 @@ export class AuthService {
             return;
         }
 
-        const passwordHash = await Bun.password.hash(this.options.superadminPassword);
+        const passwordHash = await argon2.hash(this.options.superadminPassword);
         try {
             await this.repository.create({
                 email: this.options.superadminEmail.toLowerCase(),
@@ -58,7 +59,7 @@ export class AuthService {
             throw new UnauthorizedError("Invalid email or password");
         }
 
-        const validPassword = await Bun.password.verify(input.password, account.passwordHash);
+        const validPassword = await argon2.verify(account.passwordHash, input.password);
         if (!validPassword) {
             throw new UnauthorizedError("Invalid email or password");
         }
@@ -96,7 +97,7 @@ export class AuthService {
             throw new ConflictError("Admin account already exists");
         }
 
-        const passwordHash = await Bun.password.hash(input.password);
+        const passwordHash = await argon2.hash(input.password);
         const account = await this.repository.create({
             email: input.email,
             name: input.name,
