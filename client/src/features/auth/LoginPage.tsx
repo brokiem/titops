@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogIn } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -67,7 +67,7 @@ export function LoginPage() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-              <LogIn className="h-4 w-4" />
+              {form.formState.isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
               {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
