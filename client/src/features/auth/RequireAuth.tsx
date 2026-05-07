@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
 
 export function RequireAuth() {
@@ -13,7 +13,7 @@ export function RequireAuth() {
         role="status"
         aria-live="polite"
       >
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" aria-hidden="true" />
+        <Loader className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
         <span className="sr-only">Loading...</span>
       </div>
     );
