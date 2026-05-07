@@ -24,20 +24,19 @@ export const createApp = (options: CreateAppOptions = {}) => {
     const rootApp = new Hono();
 
     const app = rootApp.basePath('/api');
-
     app.use('*', cors());
     app.get('/', (c) => c.json({status: 'ok'}));
 
     setupErrorHandler(rootApp, logger);
 
+    const authMiddleware = createAuthMiddleware(env.JWT_SECRET);
+
     const authModule = new AuthRoute(db, {
         jwtSecret: env.JWT_SECRET,
         superadminEmail: env.SUPERADMIN_EMAIL,
-        superadminPassword: env.SUPERADMIN_PASSWORD,
-    });
+        superadminPassword: env.SUPERADMIN_PASSWORD
+    }, authMiddleware);
     void authModule.service.ensureSuperadmin().catch((error: unknown) => logger.error(error));
-
-    const authMiddleware = createAuthMiddleware(authModule.service);
     app.route('/auth', authModule.route);
 
     const machineModule = new MachineRoute(db, {machineKeySecret: env.MACHINE_KEY_SECRET}, authMiddleware);

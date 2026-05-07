@@ -1,11 +1,11 @@
 import { ConflictError, ForbiddenError, UnauthorizedError } from "../../lib/errors";
-import type { AdminAccount } from "../../db/schema";
 import type { AdminRole, LoginResultDto } from "../../contracts";
 import argon2 from "argon2";
 import { toAdminAccountResponse } from "./auth.mapper";
 import type { AuthRepository } from "./auth.repository";
 import type { CreateAdminInput, LoginInput } from "./auth.schema";
-import { signJwt, verifyJwt } from "./jwt";
+import { signJwt } from "./jwt";
+import type {AuthVariables} from "@server/modules/auth/auth.middleware";
 
 const LOGIN_TTL_SECONDS = 24 * 60 * 60;
 
@@ -66,9 +66,10 @@ export class AuthService {
 
         const now = Math.floor(Date.now() / 1000);
         const expiresAt = new Date((now + LOGIN_TTL_SECONDS) * 1000);
-        const token = signJwt({
+        const token = await signJwt({
             sub: account.id,
             email: account.email,
+            name: account.name,
             role: account.role,
         }, this.options.jwtSecret);
 
@@ -79,17 +80,16 @@ export class AuthService {
         };
     };
 
-    public authenticateToken = async (token: string) => {
-        const payload = verifyJwt(token, this.options.jwtSecret);
-        const account = await this.repository.findActiveById(payload.sub);
+    public getAccountById = async (id: string) => {
+        const account = await this.repository.findActiveById(id);
         if (!account) {
-            throw new UnauthorizedError("Invalid auth token");
+            throw new UnauthorizedError("Account not found");
         }
 
         return account;
     };
 
-    public createAdmin = async (actor: AdminAccount, input: CreateAdminInput) => {
+    public createAdmin = async (actor: AuthVariables["admin"], input: CreateAdminInput) => {
         this.assertRole(actor, "SUPERADMIN");
 
         const existing = await this.repository.findByEmail(input.email);
@@ -112,7 +112,7 @@ export class AuthService {
         return account;
     };
 
-    private assertRole(account: AdminAccount, role: AdminRole) {
+    private assertRole(account: AuthVariables["admin"], role: AdminRole) {
         if (account.role !== role) {
             throw new ForbiddenError(`${role} access required`);
         }

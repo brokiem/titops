@@ -6,7 +6,7 @@ import { AuthRepository } from "./auth.repository";
 import { AuthService } from "./auth.service";
 import { createAdminSchema, loginSchema } from "./auth.schema";
 import { toAdminAccountResponse } from "./auth.mapper";
-import { createAuthMiddleware, type AuthVariables } from "./auth.middleware";
+import { type AuthVariables } from "./auth.middleware";
 
 export class AuthRoute {
     public route: Hono<{ Variables: AuthVariables }>;
@@ -16,13 +16,13 @@ export class AuthRoute {
         jwtSecret: string;
         superadminEmail: string;
         superadminPassword: string;
-    }) {
+    }, authMiddleware: MiddlewareHandler) {
         this.route = new Hono<{ Variables: AuthVariables }>();
 
         const repo = new AuthRepository(database);
         this.service = new AuthService(repo, options);
 
-        this.registerRoutes(this.service, createAuthMiddleware(this.service));
+        this.registerRoutes(this.service, authMiddleware);
     }
 
     private registerRoutes(service: AuthService, authMiddleware: MiddlewareHandler) {
@@ -35,7 +35,8 @@ export class AuthRoute {
 
         this.route.get('/me', authMiddleware, async (c) => {
             const admin = c.get("admin");
-            return ok(c, toAdminAccountResponse(admin));
+            const account = await service.getAccountById(admin.id);
+            return ok(c, toAdminAccountResponse(account));
         });
 
         this.route.post('/admins', authMiddleware, zValidator('json', createAdminSchema), async (c) => {
