@@ -14,8 +14,8 @@ import { useAuth } from "../features/auth/hooks/useAuth";
 export const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/dashboard/members", icon: Users, label: "Members", end: false },
-  { to: "/dashboard/scanners", icon: Radio, label: "Scanners", end: false },
   { to: "/dashboard/reports", icon: FileBarChart, label: "Reports", end: false },
+  { to: "/dashboard/scanners", icon: Radio, label: "Scanners", end: false },
   { to: "/dashboard/scanner-simulator", icon: Cpu, label: "Simulator", end: false },
 ];
 
