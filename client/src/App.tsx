@@ -1,11 +1,13 @@
 import { RouterProvider } from "react-router-dom";
+import type { ComponentProps } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 
 interface AppProps {
-  router: any;
+  router: ComponentProps<typeof RouterProvider>["router"];
 }
 
 function App({ router }: AppProps) {
@@ -21,7 +23,9 @@ function App({ router }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
         <Toaster richColors position="bottom-right" />
       </TooltipProvider>
     </QueryClientProvider>

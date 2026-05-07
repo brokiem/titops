@@ -12,6 +12,9 @@ export type {
   EnrichedAttendanceDto,
   ScanRequestDto,
   ScanRequestResultDto,
+  AdminRole,
+  AdminAccountDto,
+  LoginResultDto,
 } from "server/contracts";
 
 export interface MemberCreateInput {

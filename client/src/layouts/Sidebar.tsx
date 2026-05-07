@@ -6,8 +6,10 @@ import {
   Radio,
   FileBarChart,
   Cpu,
+  ShieldCheck,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "../features/auth/hooks/useAuth";
 
 export const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -17,18 +19,25 @@ export const navItems = [
   { to: "/dashboard/scanner-simulator", icon: Cpu, label: "Simulator", end: false },
 ];
 
+const superadminNavItems = [
+  { to: "/dashboard/admins", icon: ShieldCheck, label: "Admins", end: false },
+];
+
 interface SidebarContentProps {
   onNavigate?: () => void;
 }
 
 export const SidebarContent: FC<SidebarContentProps> = ({ onNavigate }) => {
+  const { admin } = useAuth();
+  const items = admin?.role === "SUPERADMIN" ? [...navItems, ...superadminNavItems] : navItems;
+
   return (
     <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center h-14 px-6 border-b border-sidebar-border">
         <span className="text-lg font-bold tracking-tight">TITOPS</span>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
-        {navItems.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

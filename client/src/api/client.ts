@@ -1,4 +1,5 @@
 import type { ApiEnvelope, ApiErrorResponse } from "server/contracts";
+import { getStoredToken } from "@/features/auth/auth-storage";
 
 export class ApiError extends Error {
   public code: string | undefined;
@@ -28,15 +29,23 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return body.data;
 }
 
+function withAuthHeaders(headers?: HeadersInit): HeadersInit {
+  const token = getStoredToken();
+  return {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...headers,
+  };
+}
+
 export async function get<T>(url: string, headers?: HeadersInit): Promise<T> {
-  const response = await fetch(url, { headers });
+  const response = await fetch(url, { headers: withAuthHeaders(headers) });
   return handleResponse<T>(response);
 }
 
 export async function post<T>(url: string, data?: unknown, headers?: HeadersInit): Promise<T> {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...headers },
+    headers: withAuthHeaders({ "Content-Type": "application/json", ...headers }),
     body: data ? JSON.stringify(data) : undefined,
   });
   return handleResponse<T>(response);
@@ -45,13 +54,13 @@ export async function post<T>(url: string, data?: unknown, headers?: HeadersInit
 export async function patch<T>(url: string, data: unknown, headers?: HeadersInit): Promise<T> {
   const response = await fetch(url, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", ...headers },
+    headers: withAuthHeaders({ "Content-Type": "application/json", ...headers }),
     body: JSON.stringify(data),
   });
   return handleResponse<T>(response);
 }
 
 export async function del<T>(url: string, headers?: HeadersInit): Promise<T> {
-  const response = await fetch(url, { method: "DELETE", headers });
+  const response = await fetch(url, { method: "DELETE", headers: withAuthHeaders(headers) });
   return handleResponse<T>(response);
 }
