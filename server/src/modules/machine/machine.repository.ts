@@ -56,13 +56,7 @@ export class MachineRepository {
     }
 
     public touchHeartbeatById = async (id: string, heartbeatAt: Date) => {
-        const existing = await this.findById(id);
-        if (!existing) {
-            return null;
-        }
-
-        await this.database.update(machines).set({lastHeartbeatAt: heartbeatAt}).where(eq(machines.id, id));
-        return this.findById(id);
+        await this.database.update(machines).set({ lastHeartbeatAt: heartbeatAt }).where(eq(machines.id, id));
     }
 
     public findActiveSession = async () => {

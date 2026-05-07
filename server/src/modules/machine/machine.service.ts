@@ -73,14 +73,15 @@ export class MachineService {
     }
 
     public sendHeartbeat = async (id: string, machineKey: string) => {
-        await this.validateMachineKey(id, machineKey);
+        const machine = await this.validateMachineKey(id, machineKey);
 
-        const machine = await this.machineRespository.touchHeartbeatById(id, new Date());
-        if (!machine) {
-            throw new NotFoundError('Machine not found');
-        }
+        const now = new Date();
+        await this.machineRespository.touchHeartbeatById(id, now);
 
-        return machine;
+        return {
+            ...machine,
+            lastHeartbeatAt: now,
+        };
     }
 
     public sendScanRequest = async (machineId: string, machineKey: string, cardUidHex: string, idempotencyKey: string) => {
