@@ -29,7 +29,7 @@ export function useEnrichedAttendance(sessionId: string): {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["session", sessionId, "enriched-attendance"],
     queryFn: () => fetchEnrichedAttendance(sessionId),
-    refetchInterval: 3000,
+    refetchInterval: 2000,
   });
 
   return { attendance: data, isLoading, isError, error, refetch };
@@ -43,7 +43,7 @@ export function useUnknownScans(sessionId: string): {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["session", sessionId, "scans", "UNKNOWN_CARD"],
     queryFn: () => fetchScanRequests(sessionId, "UNKNOWN_CARD"),
-    refetchInterval: 5000,
+    refetchInterval: 2000,
   });
 
   return { scans: data, isLoading, refetch };
