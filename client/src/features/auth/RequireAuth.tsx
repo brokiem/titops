@@ -13,7 +13,7 @@ export function RequireAuth() {
         role="status"
         aria-live="polite"
       >
-        <Loader className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
+        <Loader className="h-10 w-10 animate-spin text-primary/50" aria-hidden="true" />
         <span className="sr-only">Loading...</span>
       </div>
     );
