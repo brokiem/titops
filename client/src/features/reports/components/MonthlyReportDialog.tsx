@@ -86,11 +86,7 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
 
   const selectedCount = selectedSessionIds.size;
   const hasSessionsForPeriod = exportableSessions.length > 0;
-  const allVisibleSelected = hasSessionsForPeriod && selectedCount === exportableSessions.length;
   const selectedMonthLabel = `${MONTHS[parseInt(selectedMonth, 10)]} ${selectedYear}`;
-  const reportSummary = hasSessionsForPeriod
-    ? `${selectedCount} of ${exportableSessions.length} sessions selected`
-    : "No closed sessions available";
 
   const handleExport = async () => {
     if (!members) {
@@ -181,9 +177,6 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Label>Sessions to include</Label>
-                  {hasSessionsForPeriod ? (
-                    <Badge variant={allVisibleSelected ? "default" : "secondary"}>{reportSummary}</Badge>
-                  ) : null}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Choose exactly which sessions should be included in the Excel workbook.
@@ -252,7 +245,7 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
           </Button>
           <Button onClick={handleExport} disabled={!hasSessionsForPeriod || selectedCount === 0 || isExporting}>
             {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <></>}
-            Export {selectedCount > 0 ? `${selectedCount} ` : ""}to Excel
+            Export to Excel
           </Button>
         </DialogFooter>
       </DialogContent>
