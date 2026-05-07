@@ -13,6 +13,7 @@ export function useScanners(): {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["scanners"],
     queryFn: fetchScanners,
+    refetchInterval: 5000
   });
 
   return { scanners: data, isLoading, isError, error, refetch };
