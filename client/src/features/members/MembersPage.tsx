@@ -2,6 +2,7 @@ import {useState, useMemo} from "react";
 import {Plus, Search, Users, Loader2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import {Select, SelectTrigger, SelectContent, SelectItem, SelectValue} from "@/components/ui/select";
 import {PageHeader} from "@/components/PageHeader";
 import {EmptyState} from "@/components/EmptyState";
 import {ErrorState} from "@/components/ErrorState";
@@ -12,7 +13,8 @@ import {MemberFormDialog} from "./components/MemberFormDialog";
 import {useMembers, useCreateMember, useUpdateMember, useDeleteMember} from "./hooks/useMembers";
 import {useDebounce} from "@/hooks/use-debounce";
 import type {MemberDto} from "@/types/api";
-import { Card, CardContent } from "@/components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
+import {MAJORS} from "server/contracts";
 
 export function MembersPage() {
     const {members, isLoading, isError, error, refetch} = useMembers();
@@ -22,19 +24,37 @@ export function MembersPage() {
 
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search);
+    const [majorFilter, setMajorFilter] = useState("all");
+    const [cardFilter, setCardFilter] = useState("all");
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingMember, setEditingMember] = useState<MemberDto | null>(null);
     const [deletingMember, setDeletingMember] = useState<MemberDto | null>(null);
 
+    const hasActiveFilters =
+        search.trim().length > 0 ||
+        majorFilter !== "all" ||
+        cardFilter !== "all";
+
     const filteredMembers = useMemo(() => {
         if (!members) return undefined;
-        if (!debouncedSearch) return members;
-        const q = debouncedSearch.toLowerCase();
-        return members.filter(
-            (m) => m.name.toLowerCase().includes(q) || m.nim.includes(q),
-        );
-    }, [members, debouncedSearch]);
+        const q = debouncedSearch.trim().toLowerCase();
+
+        return members.filter((member) => {
+            return (
+                (!q || member.name.toLowerCase().includes(q) || member.nim.toLowerCase().includes(q)) &&
+                (majorFilter === "all" || member.major === majorFilter) &&
+                (cardFilter !== "without-card" || !member.cardUid) &&
+                (cardFilter !== "with-card" || !!member.cardUid)
+            );
+        });
+    }, [members, debouncedSearch, majorFilter, cardFilter]);
+
+    const resetFilters = () => {
+        setSearch("");
+        setMajorFilter("all");
+        setCardFilter("all");
+    };
 
     const handleEdit = (member: MemberDto) => {
         setEditingMember(member);
@@ -65,39 +85,89 @@ export function MembersPage() {
                 }
             />
 
-            <div className="mb-4 relative max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-                <Input
-                    placeholder="Search by name or NIM…"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-9 pr-9"
-                    id="member-search"
-                />
-                {search !== debouncedSearch && search.length > 0 && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />}
-            </div>
+            {isError && <ErrorState message={error?.message} onRetry={refetch}/>}
 
-          {isError && <ErrorState message={error?.message} onRetry={refetch}/>}
+            <Card className="gap-0 overflow-hidden border-border/70 bg-card/95 shadow-sm py-0 mb-4">
+                <div className="border-b px-6 py-4">
+                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_180px_auto] items-end">
+                        <div className="relative max-w-md">
+                            <Search className="pointer-events-none absolute left-3 inset-y-0 my-auto h-4 w-4 text-muted-foreground"/>
+                            <Input
+                                id="member-search"
+                                placeholder="Search by name or NIM…"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9 pr-9"
+                            />
+                            {search !== debouncedSearch && search.length > 0 && (
+                                <Loader2 className="pointer-events-none absolute right-3 inset-y-0 my-auto h-4 w-4 animate-spin text-muted-foreground"/>
+                            )}
+                        </div>
 
-          {isLoading && (
-              <Card className="gap-0 overflow-hidden border-border/70 bg-card/95 shadow-sm py-0">
-                  <CardContent className="px-0">
-                      <MemberTableSkeleton/>
-                  </CardContent>
-              </Card>
-          )}
+                        <div className="space-y-1">
+                            <Select value={majorFilter} onValueChange={setMajorFilter}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="All majors"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All majors</SelectItem>
+                                    {MAJORS.map((major) => (
+                                        <SelectItem key={major} value={major}>
+                                            {major}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-          {!isLoading && filteredMembers && filteredMembers.length === 0 && (
-              <EmptyState icon={<Users className="h-10 w-10 mt-10"/>} title="No members found" description={search ? "Try a different search term." : "Create your first member to get started."}/>
-          )}
+                        <div className="space-y-1">
+                            <Select value={cardFilter} onValueChange={setCardFilter}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="All members"/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All members</SelectItem>
+                                    <SelectItem value="without-card">No card assigned</SelectItem>
+                                    <SelectItem value="with-card">Has card assigned</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
 
-            {!isLoading && filteredMembers && filteredMembers.length > 0 && (
-                <Card className="gap-0 overflow-hidden border-border/70 bg-card/95 shadow-sm py-0">
-                    <CardContent className="px-0">
-                        <MemberTable members={filteredMembers} onEdit={handleEdit} onDelete={setDeletingMember}/>
-                    </CardContent>
-                </Card>
-            )}
+                <CardContent className="px-0">
+                    {isLoading ? (
+                        <div className="px-0">
+                            <MemberTableSkeleton/>
+                        </div>
+                    ) : members && members.length === 0 ? (
+                        <div className="p-6">
+                            <EmptyState
+                                icon={<Users className="h-10 w-10"/>}
+                                title="No members yet"
+                                description="Create your first member to get started."
+                            />
+                        </div>
+                    ) : filteredMembers && filteredMembers.length === 0 ? (
+                        <div className="p-6">
+                            <EmptyState
+                                icon={<Users className="h-10 w-10"/>}
+                                title="No members match your filters"
+                                description={hasActiveFilters ? "Try adjusting or clearing filters to find members." : "Try a different search term."}
+                                action={hasActiveFilters ? (
+                                    <Button variant="outline" onClick={resetFilters}>
+                                        Clear filters
+                                    </Button>
+                                ) : undefined}
+                            />
+                        </div>
+                    ) : filteredMembers && filteredMembers.length > 0 ? (
+                        <div className="px-0">
+                            <MemberTable members={filteredMembers} onEdit={handleEdit} onDelete={setDeletingMember}/>
+                        </div>
+                    ) : null}
+                </CardContent>
+            </Card>
 
             <MemberFormDialog
                 open={formOpen}
