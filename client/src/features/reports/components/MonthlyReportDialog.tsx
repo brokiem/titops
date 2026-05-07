@@ -25,6 +25,12 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+const WEEK_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
+function getWeekLabel(index: number): string {
+  return WEEK_LABELS[index - 1] || String(index);
+}
+
 export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyReportDialogProps) {
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -53,9 +59,21 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
     }).sort((a, b) => new Date(a.startedAt ?? a.createdAt).getTime() - new Date(b.startedAt ?? b.createdAt).getTime());
   }, [sessions, selectedMonth, selectedYear]);
 
-  const selectedSessionIds = useMemo(() => {
-    return new Set(filteredSessions.filter(s => !excludedSessionIds.has(s.id)).map(s => s.id));
+  const exportableSessions = useMemo(() => {
+    return filteredSessions.filter(s => !s.isActive);
+  }, [filteredSessions]);
+
+  const selectedSessions = useMemo(() => {
+    return exportableSessions.filter(s => !excludedSessionIds.has(s.id));
   }, [excludedSessionIds, filteredSessions]);
+
+  const selectedSessionIds = useMemo(() => {
+    return new Set(selectedSessions.map(s => s.id));
+  }, [selectedSessions]);
+
+  const selectedSessionOrder = useMemo(() => {
+    return new Map(selectedSessions.map((session, index) => [session.id, index + 1]));
+  }, [selectedSessions]);
 
   const handleToggleSession = (id: string, checked: boolean) => {
     setExcludedSessionIds(prev => {
@@ -67,12 +85,12 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
   };
 
   const selectedCount = selectedSessionIds.size;
-  const hasSessionsForPeriod = filteredSessions.length > 0;
-  const allVisibleSelected = hasSessionsForPeriod && selectedCount === filteredSessions.length;
+  const hasSessionsForPeriod = exportableSessions.length > 0;
+  const allVisibleSelected = hasSessionsForPeriod && selectedCount === exportableSessions.length;
   const selectedMonthLabel = `${MONTHS[parseInt(selectedMonth, 10)]} ${selectedYear}`;
   const reportSummary = hasSessionsForPeriod
-    ? `${selectedCount} of ${filteredSessions.length} sessions selected`
-    : "No sessions available";
+    ? `${selectedCount} of ${exportableSessions.length} sessions selected`
+    : "No closed sessions available";
 
   const handleExport = async () => {
     if (!members) {
@@ -80,7 +98,7 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
       return;
     }
 
-    const sessionsToExport = filteredSessions.filter(s => selectedSessionIds.has(s.id));
+    const sessionsToExport = selectedSessions;
     if (sessionsToExport.length === 0) {
       toast.error("Please select at least one session to export.");
       return;
@@ -173,9 +191,9 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
               </div>
             </div>
             <div>
-              <ScrollArea className="h-[280px]">
+              <ScrollArea className="h-70">
                 {filteredSessions.length === 0 ? (
-                  <div className="flex h-[240px] flex-col items-center justify-center px-6 text-center">
+                  <div className="flex h-60 flex-col items-center justify-center px-6 text-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <CalendarDays className="h-5 w-5" />
                     </div>
@@ -190,26 +208,33 @@ export function MonthlyReportDialog({ open, onOpenChange, sessions }: MonthlyRep
                       <label
                         key={session.id}
                         htmlFor={`monthly-report-session-${session.id}`}
-                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/40"
+                        className={`flex items-start gap-3 px-4 py-3 transition-colors ${session.isActive ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-muted/40"}`}
                       >
                         <Checkbox
                           id={`monthly-report-session-${session.id}`}
                           className="mt-1"
                           checked={selectedSessionIds.has(session.id)}
                           onCheckedChange={(checked) => handleToggleSession(session.id, checked as boolean)}
-                          disabled={isExporting}
+                          disabled={isExporting || session.isActive}
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                            <span className="truncate text-sm font-medium text-foreground">{session.name}</span>
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className="truncate text-sm font-medium text-foreground">{session.name}</span>
+                              <Badge
+                                variant={selectedSessionIds.has(session.id) ? "secondary" : "outline"}
+                                className="shrink-0 rounded-md text-[10px] uppercase tracking-wide"
+                              >
+                                {session.isActive
+                                  ? "Not exportable"
+                                  : selectedSessionIds.has(session.id)
+                                    ? `Week ${getWeekLabel(selectedSessionOrder.get(session.id) ?? 0)}`
+                                    : "Excluded"}
+                              </Badge>
+                            </div>
                             <span className="text-xs font-medium text-muted-foreground">
                               {formatDateShort(session.startedAt ?? session.createdAt)}
                             </span>
-                          </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                            {session.isActive ? (
-                              <Badge variant="secondary" className="rounded-md">Live</Badge>
-                            ) : null}
                           </div>
                         </div>
                       </label>
