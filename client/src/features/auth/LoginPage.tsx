@@ -47,7 +47,7 @@ export function LoginPage() {
     <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-sm rounded-lg">
         <CardHeader>
-          <CardTitle className="text-xl">TITOPS</CardTitle>
+          <CardTitle className="text-xl">CHAKRA</CardTitle>
           <CardDescription>Sign in with an admin account.</CardDescription>
         </CardHeader>
         <CardContent>

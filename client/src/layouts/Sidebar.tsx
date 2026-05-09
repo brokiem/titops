@@ -34,7 +34,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({ onNavigate }) => {
   return (
     <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center h-14 px-6 border-b border-sidebar-border">
-        <span className="text-lg font-bold tracking-tight">TITOPS</span>
+        <span className="text-lg font-bold tracking-tight">CHAKRA</span>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
         {items.map((item) => (
@@ -58,7 +58,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({ onNavigate }) => {
       </nav>
       <Separator className="bg-sidebar-border" />
       <div className="px-6 py-4">
-        <p className="text-xs text-sidebar-foreground/50">TITOPS v1.0</p>
+        <p className="text-xs text-sidebar-foreground/50">CHAKRA v1.0</p>
       </div>
     </div>
   );

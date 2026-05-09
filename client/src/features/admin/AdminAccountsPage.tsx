@@ -41,7 +41,7 @@ export function AdminAccountsPage() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Admin Accounts" description="Create admin accounts for TITOPS users." />
+      <PageHeader title="Admin Accounts" description="Create admin accounts for CHAKRA users." />
       <Card className="rounded-lg">
         <CardHeader>
           <CardTitle>Create Admin</CardTitle>
