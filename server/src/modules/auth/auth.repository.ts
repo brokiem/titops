@@ -45,7 +45,12 @@ export class AuthRepository {
         passwordHash: string;
         role: AdminAccount["role"];
     }) => {
-        const [result] = await this.database.insert(adminAccounts).values(data).$returningId();
+        const now = new Date();
+        const [result] = await this.database.insert(adminAccounts).values({
+            ...data,
+            createdAt: now,
+            updatedAt: now,
+        }).$returningId();
         if (!result) {
             return null;
         }

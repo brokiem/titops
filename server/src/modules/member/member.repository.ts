@@ -33,10 +33,13 @@ export class MemberRepository {
     }
 
     public create = async (name: string, nim: string, major: string) => {
+        const now = new Date();
         const [result] = await this.database.insert(members).values({
             name: name,
             nim: nim,
-            major: major
+            major: major,
+            createdAt: now,
+            updatedAt: now,
         }).$returningId();
 
         if (!result) {
@@ -52,7 +55,10 @@ export class MemberRepository {
             return null;
         }
 
-        await this.database.update(members).set(omitUndefinedValues(data)).where(eq(members.id, id));
+        await this.database.update(members).set(omitUndefinedValues({
+            ...data,
+            updatedAt: new Date(),
+        })).where(eq(members.id, id));
         return this.findById(id);
     }
 
@@ -74,9 +80,12 @@ export class MemberRepository {
     }
 
     public createCardAssignment = async (memberId: string, cardUid: string) => {
+        const now = new Date();
         const [result] = await this.database.insert(cardAssignments).values({
             memberId: memberId,
             cardUid: cardUid,
+            createdAt: now,
+            updatedAt: now,
         }).$returningId();
         if (!result) {
             return null;
@@ -95,7 +104,10 @@ export class MemberRepository {
     }
 
     public updateCardAssignment = async (id: string, cardUid: string) => {
-        await this.database.update(cardAssignments).set({cardUid: cardUid}).where(eq(cardAssignments.id, id));
+        await this.database.update(cardAssignments).set({
+            cardUid: cardUid,
+            updatedAt: new Date(),
+        }).where(eq(cardAssignments.id, id));
         const [assignment] = await this.database.select().from(cardAssignments)
             .where(eq(cardAssignments.id, id)).limit(1);
         return assignment ?? null;

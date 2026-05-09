@@ -24,9 +24,12 @@ export class MachineRepository {
     }
 
     public create = async (name: string, machineKeyDigest: string) => {
+        const now = new Date();
         const [result] = await this.database.insert(machines).values({
             name: name,
             machineKeyDigest: machineKeyDigest,
+            createdAt: now,
+            updatedAt: now,
         }).$returningId();
         if (!result) {
             return null;
@@ -41,7 +44,10 @@ export class MachineRepository {
             return null;
         }
 
-        await this.database.update(machines).set(omitUndefinedValues(data)).where(eq(machines.id, id));
+        await this.database.update(machines).set(omitUndefinedValues({
+            ...data,
+            updatedAt: new Date(),
+        })).where(eq(machines.id, id));
         return this.findById(id);
     }
 
@@ -56,7 +62,10 @@ export class MachineRepository {
     }
 
     public touchHeartbeatById = async (id: string, heartbeatAt: Date) => {
-        await this.database.update(machines).set({ lastHeartbeatAt: heartbeatAt }).where(eq(machines.id, id));
+        await this.database.update(machines).set({
+            lastHeartbeatAt: heartbeatAt,
+            updatedAt: heartbeatAt,
+        }).where(eq(machines.id, id));
     }
 
     public findActiveSession = async () => {
@@ -99,6 +108,8 @@ export class MachineRepository {
             sessionId: sessionId,
             cardAssignmentId: cardAssignmentId,
             checkInAt: checkInAt,
+            createdAt: checkInAt,
+            updatedAt: checkInAt,
         }).$returningId();
         if (!result) {
             return null;
@@ -111,7 +122,10 @@ export class MachineRepository {
     }
 
     public checkOutAttendanceById = async (attendanceId: string, checkOutAt: Date) => {
-        await this.database.update(attendance).set({checkOutAt: checkOutAt}).where(eq(attendance.id, attendanceId));
+        await this.database.update(attendance).set({
+            checkOutAt: checkOutAt,
+            updatedAt: checkOutAt,
+        }).where(eq(attendance.id, attendanceId));
 
         const [attendanceRecord] = await this.database.select().from(attendance)
             .where(eq(attendance.id, attendanceId)).limit(1);
@@ -125,6 +139,7 @@ export class MachineRepository {
         cardUid: string;
         idempotencyKey: string;
         outcome: ScanRequest["outcome"];
+        createdAt: Date;
     }) => {
         const [result] = await this.database.insert(scanRequests).values(data).$returningId();
         if (!result) {

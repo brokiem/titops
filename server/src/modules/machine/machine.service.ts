@@ -156,6 +156,7 @@ export class MachineService {
                     cardUid: cardUidNormalized,
                     idempotencyKey: idempotencyKey,
                     outcome: outcome,
+                    createdAt: now,
                 });
             } catch (error) {
                 const dbError = error as { code?: string };

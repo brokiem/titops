@@ -24,8 +24,11 @@ export class SessionRepository {
     }
 
     public create = async (name: string) => {
+        const now = new Date();
         const [result] = await this.database.insert(sessions).values({
             name: name,
+            createdAt: now,
+            updatedAt: now,
         }).$returningId();
         if (!result) {
             return null;
@@ -40,7 +43,10 @@ export class SessionRepository {
             return null;
         }
 
-        await this.database.update(sessions).set(omitUndefinedValues(data)).where(eq(sessions.id, id));
+        await this.database.update(sessions).set(omitUndefinedValues({
+            ...data,
+            updatedAt: new Date(),
+        })).where(eq(sessions.id, id));
         return this.findById(id);
     }
 
@@ -53,6 +59,7 @@ export class SessionRepository {
         await this.database.update(sessions).set(omitUndefinedValues({
             mode: data.mode,
             startedAt: data.startedAt,
+            updatedAt: new Date(),
         })).where(eq(sessions.id, id));
 
         return this.findById(id);
@@ -69,6 +76,7 @@ export class SessionRepository {
             closedAt: closedAt,
             isActive: false,
             activeSingleton: null,
+            updatedAt: new Date(),
         }).where(eq(sessions.id, id));
 
         return this.findById(id);
